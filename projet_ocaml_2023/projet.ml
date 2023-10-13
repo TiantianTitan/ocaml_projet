@@ -1,3 +1,4 @@
+
 (**********************Question 1.1*********************)
 
 
@@ -26,7 +27,24 @@ let completion couple =
 (**********************Question 1.4 ********************)
 
 
+let composition lb = 
+  let rec aux lb acc =
+    match  lb with
+    | [] -> acc
+    | hd :: tl -> if hd = true then aux tl (acc*2+1)
+                  else aux tl (acc*2)
+  in aux (List.rev lb) 0
 
+  
+(**********************Question 1.5 ********************)
+
+
+
+
+
+(**********************Question 1.6 ********************)
+
+(**********************Question 1.7 ********************)
 
 
 
