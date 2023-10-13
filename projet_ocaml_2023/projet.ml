@@ -68,11 +68,15 @@ let pow_rec a n =
 let genAlea n = 
   let rec aux n acc  =
     if n < 0 then acc
-    else if n <= 64 then (decomposition (Int64.to_int (Random.int64 (Int64.of_int (pow 2 n))))) :: acc
+    else if n < 64 then (decomposition (Int64.to_int (Random.int64 (Int64.of_int (pow 2 n))))) :: acc
     else aux (n-64) ((decomposition  (Int64.to_int (Random.int64 Int64.max_int)))::acc)
-  in aux n []
+  in aux n [];;
 
-
+  (** test **)
+  genAlea 0;;
+  genAlea 64;;
+  genAlea 65;;
+  genAlea 100;;
 
 (**********************Question 2.7 ********************)
 
