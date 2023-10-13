@@ -23,26 +23,47 @@ let completion couple =
       | hd :: tl -> aux tl (t-1) (hd::acc)
   in List.rev (aux l t []) 
 
+  (**    test    ****)
+
 
 (**********************Question 1.4 ********************)
 
 
 let composition lb = 
   let rec aux lb acc =
-    match  lb with
+    match lb with
     | [] -> acc
     | hd :: tl -> if hd = true then aux tl (acc*2+1)
                   else aux tl (acc*2)
   in aux (List.rev lb) 0
 
+
+(***test**)
+let listbool = [false;true;true];;
+composition listbool;;
+
   
 (**********************Question 1.5 ********************)
 
+let table x n = completion ((decomposition x),n);;
 
-
-
+(*test*)
+table 15 3;;
+table 12 4;;
+table 5 8;;
 
 (**********************Question 1.6 ********************)
+
+
+
+let genAlea n = 
+  let rec aux n acc  =
+    if n < 0 then acc
+    else if n < 64 then (decomposition (Int64.to_int (Random.int64))) :: acc
+    else aux (n-64) ((decomposition (Random.int (pow 2 63)))::acc)
+  in aux n []
+
+
 
 (**********************Question 1.7 ********************)
 
