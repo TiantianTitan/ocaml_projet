@@ -54,18 +54,27 @@ table 5 8;;
 
 (**********************Question 1.6 ********************)
 
+let rec pow a n =
+  if n = 0 then 1
+  else a* (pow a (n-1))
 
+let pow_rec a n =
+  let rec aux n acc=
+    match n with
+    | 0 -> acc  
+    | _ -> aux (n-1) (a*acc)
+    in aux n 1
 
 let genAlea n = 
   let rec aux n acc  =
     if n < 0 then acc
-    else if n < 64 then (decomposition (Int64.to_int (Random.int64))) :: acc
-    else aux (n-64) ((decomposition (Random.int (pow 2 63)))::acc)
+    else if n <= 64 then (decomposition (Int64.to_int (Random.int64 (Int64.of_int (pow 2 n))))) :: acc
+    else aux (n-64) ((decomposition  (Int64.to_int (Random.int64 Int64.max_int)))::acc)
   in aux n []
 
 
 
-(**********************Question 1.7 ********************)
+(**********************Question 2.7 ********************)
 
 
 
