@@ -61,7 +61,7 @@ let rec pow a n =
   if n = 0 then 1
   else a* (pow a (n-1))
 
-  (*récursive terminale*)
+(*récursive terminale*)
 let pow_rec a n =
   let rec aux n acc=
     match n with
@@ -88,9 +88,7 @@ type decision_binary_tree =
   | Leaf of bool
   | Node of int * decision_binary_tree * decision_binary_tree
 
-
 (**********************Question 2.8 ********************)
-
 let rec log2_depth n =
   if n <= 0 then failwith "n <= 0"
   else if n = 1 || n = 2 then 1
@@ -104,37 +102,107 @@ let depth_arbre lb = log2_depth (List.length lb)
 
 
 let cons_chemin_list lb =
+  let length = List.length lb in
   let rec aux lb n acc =
     match lb with
     | [] -> acc
-    | hd :: tl -> aux tl (n+1) (((decomposition n),hd)::acc)
-    in List.rev (aux lb 0 [])
+    | hd :: tl -> let com = List.rev (completion ( (decomposition n), log2_depth length) ) in aux tl (n+1) (  (com ,hd ) :: acc)
+    in  List.rev (aux lb 0 []) ;;
 
+let chemin_list1 = cons_chemin_list [false;false;true] ;;   
+(* [([false; false], false); ([false; true], false); ([true; false], true)] *)
+let chemin_list2 = cons_chemin_list [true;false;true;true;true];;
+(* 
+[([false; false; false], true); ([false; false; true], false);([false; true; false], true); ([false; true; true], true);([true; false; false], true)] *)
 
 
   let cons_vide_arbre n =
-    
+    if n = 0 then failwith "Empty tree"
+    else 
+      let rec constructor depth =
+        if depth = n+1 then Leaf(false)
+        else Node (depth, constructor (depth+1),constructor (depth+1))
+      in constructor 1
+
+let ex_tree = cons_vide_arbre 2 ;; 
+(*val ex_tree : decision_binary_tree =
+   Node (1, 
+      Node (2, Leaf false, Leaf false), 
+      Node (2, Leaf false, Leaf false))*)
 
 
+let rec inserer chemin_bool arbre =
+  let chemin,boolean = chemin_bool in
+  if boolean = false then arbre  (*Parce que cons_vide c'est tous false *)
+  else
+  match arbre with
+    | Leaf(_) -> Leaf(boolean)
+    | Node(depth,l,r) ->
+        match chemin with
+        | [] -> Leaf(boolean) 
+        | hd :: tl -> 
+            if hd = false then Node(depth, inserer (tl,boolean) l,r)
+            else  Node(depth,l,inserer (tl,boolean) r)  
 
+let ex_inserer = inserer ([false;false],true) (inserer ([true;false],true) ex_tree )  (* insérer 1 leaf et 3 leaf*)
+(* val ex_inserer : decision_binary_tree =
+  Node (1, Node (2, Leaf true, Leaf false), Node (2, Leaf true, Leaf false)) *)
 
 let cons_arbre lb = 
-  let chemin_bool = (cons_chemin_list lb) in
-  let rec aux chemin_bool acc=
-    match chemin_bool with
+  let chemin_bool_list = cons_chemin_list lb in
+  let depth = depth_arbre lb in
+  let arbre_init = cons_vide_arbre depth in
+  let rec inserer_list chemin_bool_list acc =
+    match chemin_bool_list with
+    | [] -> acc
+    | hd :: tl -> inserer_list tl (inserer hd acc)
+    in inserer_list chemin_bool_list arbre_init 
+
+
+    (* test correct *)
+let ex_list1 = [true;false;true]
+let ex_list2 = [true;true;true;true;false;false;false;false;true]
+
+let ex_cons_arbre1 = cons_arbre ex_list1 
+(* [true; true; true; true; false; false; false; false; true] *)
+
+let ex_cons_arbre2 = cons_arbre ex_list2 
+
+(* Node (1,
+   Node (2,
+    Node (3, Node (4, Leaf true, Leaf true), Node (4, Leaf true, Leaf true)),
+    Node (3, Node (4, Leaf false, Leaf false),
+     Node (4, Leaf false, Leaf false))),
+   Node (2,
+    Node (3, Node (4, Leaf true, Leaf false), Node (4, Leaf false, Leaf false)),
+    Node (3, Node (4, Leaf false, Leaf false),
+     Node (4, Leaf false, Leaf false)))) *)
     
 
+(********************** test de la question 2.8  --> 25899 ********************************)
 
-    
+let ex_25899 = decomposition 25899;;
+(* [true; true; false; true; false; true; false; false; true; false; true; false;false; true; true] *)
+
+let dbt_25899 = cons_arbre ex_25899;;
+
+(* Node (1,
+    Node (2,
+      Node (3, Node (4, Leaf true, Leaf true), Node (4, Leaf false, Leaf true)),
+      Node (3, Node (4, Leaf false, Leaf true), Node (4, Leaf false, Leaf false))),
+    Node (2,
+      Node (3, Node (4, Leaf true, Leaf false), Node (4, Leaf true, Leaf false)),
+      Node (3, Node (4, Leaf false, Leaf true), Node (4, Leaf true, Leaf false)))) *)
+
+      (********************** exactement correcte ********************)
+(***********************************************************************************)
+
+
+(**********************Question 2.9 ********************)
 
 
 
-  (**
-  match lb with
-  | [] -> failwith "Empty liste boolean"
-  | [x] -> 
-  | hd :: tl ->
-*)
+
 
 
 
