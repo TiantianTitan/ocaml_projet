@@ -260,6 +260,27 @@ let liste_feuilles_25899 = liste_feuilles dbt_25899
 
 (**********************Question 3.10 ********************)
 
+type node = { depth: int;}
+
+type elements = { 
+    entier: int list; 
+    node: node 
+}
+
+type liste_deja_vus = elements list
+
+(**********************Question 3.11 ********************)
+
+(** Utilisation de ref := et ! **)
+let list_vide = ref [];;    (** val list_vide : '_weak1 list ref = {contents = []} **)
+list_vide := 1 :: !list_vide;;  (** - : unit = () **)
+list_vide ;; (** - : int list ref = {contents = [1]} **)
+
+
+let compressionParListe arbre_decision =
+  let listeDejaVus = ref [] in
+  (***** to_do ****)
+  listeDejaVus, 1
 
 
 
