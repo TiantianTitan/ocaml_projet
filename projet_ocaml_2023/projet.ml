@@ -200,6 +200,24 @@ let dbt_25899 = cons_arbre ex_25899;;
 
 (**********************Question 2.9 ********************)
 
+let liste_feuilles arbre =
+  let rec aux arbre acc =
+    match arbre with
+      | Leaf (b) -> b :: acc
+      | Node (_,l,r) -> aux r (aux l acc)
+  in List.rev (aux arbre [])
+
+let liste_feuilles_25899 = liste_feuilles dbt_25899
+
+(*      test:
+    [ true; true; false; true; 
+      false; true; false; false; 
+      true; false; true; false; 
+      false; true; true; false]  correcte!  *)
+
+
+
+(**********************Question 3.10 ********************)
 
 
 
