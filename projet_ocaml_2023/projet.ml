@@ -12,10 +12,10 @@ let decomposition num =
     else let modulo = num mod 2 in 
       if modulo = 1 then aux (num/2) (true :: acc)
       else aux (num/2) (false :: acc)
-    in List.rev (aux num []);;
+    in List.rev (aux num [])
 
 (**    test   **)
-let ex_dec = decomposition(38);; (*[false; true; true; false; false; true]*)
+let ex_dec = decomposition(38) (*[false; true; true; false; false; true]*)
 (**    test correcte ! **)
 
 (**********************Question 1.3 ********************)
@@ -46,21 +46,21 @@ let composition lb =
   in aux (List.rev lb) 0
 
 (***test**)
-let listbool = [false;true;true];;
-composition listbool;; (* - : int = 6 *)
-composition [true;true] (*- : int = 3 *)
+let listbool = [false;true;true]
+let ex_com1 = composition listbool (* - : int = 6 *)
+let ex_com2 = composition [true;true] (*- : int = 3 *)
 (*  test correcte *)
 
 
   
 (**********************Question 1.5 ********************)
 
-let table x n = completion ((decomposition x),n);;
+let table x n = completion ((decomposition x),n)
 
 (*test*)
-table 15 3;;  (*true; true; true]*)
-table 12 4;;  (*[false; false; true; true]*)
-table 5 8;;   (*[true; false; true; false; false; false; false; false]*)
+let tab1 = table 15 3  (*true; true; true]*)
+let tab2 = table 12 4  (*[false; false; true; true]*)
+let tab3 = table 5 8   (*[true; false; true; false; false; false; false; false]*)
 
 (**********************Question 1.6 ********************)
 
@@ -82,25 +82,25 @@ let genAlea n =
     if n < 0 then acc
     else if n < 64 then (decomposition (Int64.to_int (Random.int64 (Int64.of_int (pow_rec 2 n))))) :: acc
     else aux (n-64) ((decomposition  (Int64.to_int (Random.int64 Int64.max_int)))::acc)
-  in aux n [];;
+  in aux n []
 
-  let gen61 = (pow_rec 2 61);;  (*int = 2305843009213693952*)
-  let gen62 = (pow_rec 2 62);;  (*int = -4611686018427387904*)
+  let gen61 = (pow_rec 2 61)  (*int = 2305843009213693952*)
+  let gen62 = (pow_rec 2 62)  (*int = -4611686018427387904*)
 
-  let gen63 = (pow_rec 2 63);;  (*int = 0*)
+  let gen63 = (pow_rec 2 63)  (*int = 0*)
   (** test **)
-  genAlea 0;;   (*[[false]]*)
-  genAlea 61;;  (*[[false; false; false; true; false; false ;...; true]]*)
-  genAlea 62;;  (*Exception: Invalid_argument "Random.int64".*)
-  genAlea 63;;  (*Exception: Invalid_argument "Random.int64".*)
-  genAlea 64;;  (*[[false];
+  let ex_0 = genAlea 0   (*[[false]]*)
+  let ex_61 = genAlea 61  (*[[false; false; false; true; false; false ;...; true]]*)
+  let ex_62 = genAlea 62  (*Exception: Invalid_argument "Random.int64".*)
+  let ex_63 = genAlea 63  (*Exception: Invalid_argument "Random.int64".*)
+  let ex_64 = genAlea 64  (*[[false];
                     [true; true; false; true; false; true; true; false; false; false; false; true;
                     true; false; true; false; false; true; true; false; false; false; false;
                     true; true; false; true; true; true; false; false; false; false; false;
                     false; true; false; false; true; true; false; true; true; false; true; true;
                     false; false; true; false; false; true; true; true; true; true; true; true]]*)
 
-  genAlea 100;;  (* [ [true; false; false; false; true; true; false; false; false; false; false;
+let ex_100 = genAlea 100  (* [ [true; false; false; false; true; true; false; false; false; false; false;
                       false; true; true; true; true; true; true; true; false; true; false; true;
                       false; false; true; true; false; false; true; true; false; true];
                               [true; false; false; true; true; false; true; false; false; true; false; true;
@@ -142,26 +142,26 @@ let cons_chemin_list lb =
     match lb with
     | [] -> acc
     | hd :: tl -> let com = List.rev (completion ( (decomposition n), log2_depth length) ) in aux tl (n+1) (  (com ,hd ) :: acc)
-    in  List.rev (aux lb 0 []) ;;
+    in  List.rev (aux lb 0 []) 
 
 (*  test *)
-let chemin_list1 = cons_chemin_list [false;false;true] ;;   
+let chemin_list1 = cons_chemin_list [false;false;true]   
 (* [([false; false], false); ([false; true], false); ([true; false], true)] *)
-let chemin_list2 = cons_chemin_list [true;false;true;true;true];;
+let chemin_list2 = cons_chemin_list [true;false;true;true;true]
 (* 
 [([false; false; false], true); ([false; false; true], false);([false; true; false], true); ([false; true; true], true);([true; false; false], true)] *)
 
 (*  test correcte *)
 
-  let cons_vide_arbre n =
-    if n = 0 then failwith "Empty tree"
-    else 
-      let rec constructor depth =
-        if depth = n+1 then Leaf(false)
-        else Node (depth, constructor (depth+1),constructor (depth+1))
-      in constructor 1
+let cons_vide_arbre n =
+  if n = 0 then failwith "Empty tree"
+  else 
+    let rec constructor depth =
+      if depth = n+1 then Leaf(false)
+      else Node (depth, constructor (depth+1),constructor (depth+1))
+    in constructor 1
 
-let ex_tree = cons_vide_arbre 2 ;; 
+let ex_tree = cons_vide_arbre 2  
 (*val ex_tree : decision_binary_tree =
    Node (1, 
       Node (2, Leaf false, Leaf false), 
@@ -222,10 +222,10 @@ let ex_cons_arbre2 = cons_arbre ex_list2
 
 (********************** test de la question 2.8  --> 25899 ********************************)
 
-let ex_25899 = decomposition 25899;;
+let ex_25899 = decomposition 25899
 (* [true; true; false; true; false; true; false; false; true; false; true; false;false; true; true] *)
 
-let dbt_25899 = cons_arbre ex_25899;;
+let dbt_25899 = cons_arbre ex_25899
 
 (* Node (1,
     Node (2,
@@ -264,7 +264,7 @@ type decision_binary_tree =
   | Leaf of bool
   | Node of int * decision_binary_tree * decision_binary_tree
 
-type node = { depth: int;}
+type node = { id: int;}
 
 type elements = { 
     entier: int list; 
@@ -276,9 +276,9 @@ type liste_deja_vus = elements list
 (**********************Question 3.11 ********************)
 
 (** Utilisation de ref := et ! **)
-let list_vide = ref [];;    (** val list_vide : '_weak1 list ref = {contents = []} **)
-list_vide := 1 :: !list_vide;;  (** - : unit = () **)
-list_vide ;; (** - : int list ref = {contents = [1]} **)
+let list_vide = ref []    (** val list_vide : '_weak1 list ref = {contents = []} **)
+let _ = list_vide := 1 :: !list_vide  (** - : unit = () **)
+let list = list_vide  (** - : int list ref = {contents = [1]} **)
 
 
 (** Préparation de la fonction compressionParListe**)
@@ -291,9 +291,9 @@ let rec sup_prefix0 l =
     | hd :: tl -> 
       if hd = 0 then sup_prefix0 tl
       else l 
-;;
+
  (** test **)
- sup_prefix0 [0;0;1;0;2;0];; (*[1; 0; 2; 0]*)
+ let ex_sup_prefix0 = sup_prefix0 [0;0;1;0;2;0] (*[1; 0; 2; 0]*)
  (** test correcte! **)
  
 let liste_feuille_to_ge lf =
@@ -303,7 +303,7 @@ let liste_feuille_to_ge lf =
     | true -> List.rev ( sup_prefix0 ((composition lf) ::acc )) 
     | false -> aux (List.rev (completion ((List.rev lf),(list_length - 64)))) ((composition (completion (lf,64))) ::acc)
     (*** explication:  si length > 64, acc @ les premiers 64 ensuite on la reste sauf que les premiers 64 va continuer la récursive ***)
-  in aux lf [];;
+  in aux lf []
 
 (** test liste_feuille_to_ge  est juste derrière que le test de ge_to_liste_feuille **)
 
@@ -315,11 +315,11 @@ let decomposition_ge ge_num_liste =
     | [] -> acc
     | [x] -> acc @ (decomposition x)
     | hd :: tl ->  aux tl ( acc @ ( completion ((decomposition hd),64))) 
-  in aux ge_num_liste [];;
+  in aux ge_num_liste []
 
 (** test **)  
-decomposition_ge [1];; (*[true]*)
-decomposition_ge [2;1];; 
+let ex_dec_ge1 = decomposition_ge [1] (*[true]*)
+let ex_dec_ge2 = decomposition_ge [2;1]
 (* [false; true; false; false; false; false; false; false; false; false;   10 éléments chaque ligne
     false;false; false; false; false; false; false; false; false; false;
     false; false;false; false; false; false; false; false; false; false;
@@ -330,10 +330,10 @@ decomposition_ge [2;1];;
 
 (** test correct **)
 
-let ge_to_liste_feuille ge = liste_feuilles (cons_arbre (decomposition_ge ge));;
+let ge_to_liste_feuille ge = liste_feuilles (cons_arbre (decomposition_ge ge))
 
 (** test ge_to_liste_feuille **)
-ge_to_liste_feuille [2;1] ;;
+let ex_ge_to_fl1 = ge_to_liste_feuille [2;1] 
 
 (* 
 [false; true; false; false; false; false; false; false; false; false; 
@@ -350,32 +350,89 @@ ge_to_liste_feuille [2;1] ;;
  false; false; false; false; false; false; false; false; false;false; 
  false; false; false; false; false; false; false; false]  --> 128 élements*)
 
- ge_to_liste_feuille [1] ;;
+let ex_ge_to_fl2 = ge_to_liste_feuille [1] 
 
 
 (** test liste_feuille_to_ge **)
 
-List.length (ge_to_liste_feuille [1]);;                 (* 2 *)
-liste_feuille_to_ge (ge_to_liste_feuille [1]);;         (* - : int list = [1] *)
-List.length (ge_to_liste_feuille [2;1]);;               (* 128 *)
-liste_feuille_to_ge (ge_to_liste_feuille [2;1]);;       (* - : int list = [2;1] *)
-List.length (ge_to_liste_feuille [3;2;1]);;             (* 256 *)
-liste_feuille_to_ge (ge_to_liste_feuille [3;2;1]);;     (* - : int list = [3;2;1] *)
-List.length (ge_to_liste_feuille [4;3;2;1]);;           (* 256 *)
-List.length (ge_to_liste_feuille [5;4;3;2;1]);;         (* 512 *)
-liste_feuille_to_ge (ge_to_liste_feuille [5;4;3;2;1]);; (* - : int list = [5; 4; 3; 2; 1] *)
+let length1 = List.length (ge_to_liste_feuille [1])                 (* 2 *)
+let ex_lf_to_ge1 = liste_feuille_to_ge (ge_to_liste_feuille [1])         (* - : int list = [1] *)
+let length2 = List.length (ge_to_liste_feuille [2;1])               (* 128 *)
+let ex_lf_to_ge2 = liste_feuille_to_ge (ge_to_liste_feuille [2;1])       (* - : int list = [2;1] *)
+let length3 = List.length (ge_to_liste_feuille [3;2;1])             (* 256 *)
+let ex_lf_to_ge3 = liste_feuille_to_ge (ge_to_liste_feuille [3;2;1])     (* - : int list = [3;2;1] *)
+let length4 = List.length (ge_to_liste_feuille [4;3;2;1])           (* 256 *)
+let length5 = List.length (ge_to_liste_feuille [5;4;3;2;1])         (* 512 *)
+let ex_lf_to_ge5 = liste_feuille_to_ge (ge_to_liste_feuille [5;4;3;2;1]) (* - : int list = [5; 4; 3; 2; 1] *)
 
  (** test correct **)
 
+
+ (** 3. check si n est la première composante d’un couple stocké dans ListeDejaVus **)
+
+  let rec check_ldv n ldv =
+    match ldv with
+    | [] -> false
+    | hd :: tl ->  if  n = hd.entier then true
+    else check_ldv n tl
+
+
+(** Utilisation de type structure et instanciation **)
+type test = {
+  test1 : int;
+  test2 : string;
+}
+    
+let a = {
+  test1 = 1;
+  test2 = "Hello";
+}
+
+
+(* test *)
+let ex_node = {id = 0} 
+let ex_element = { entier = [1;2;3] ; node = ex_node ; } 
+
+let ex_ldv = [ex_element] 
+
+let ex_check1 = check_ldv [1;2;3] ex_ldv  (*true*)
+let ex_check2 = check_ldv [1;2] ex_ldv    (*false*)
+(* test correcte! *)
+
+
+let maj_noeud elem noeud l_ref =
+    let l = !l_ref in
+    let rec aux l acc=
+      match l with
+      | [] -> acc
+      | { entier = e ;node = n } :: tl -> 
+        if e = elem then aux tl ({entier = e; node = noeud} :: acc)
+        else   aux tl ({ entier = e ;node = n } :: acc)
+    in l_ref :=  (aux l [])
+
+(** test_maj_noeud **)
+let ex_ldv_ref = ref [{entier = [1;2]; node = {id = 1}};{entier = [1;2;3]; node = {id = 2}}]
+let ex_maj_noeud = maj_noeud [1;2] {id = 3} ex_ldv_ref
+
+let deja_maj = !ex_ldv_ref  (* [{entier = [1; 2; 3]; node = {id = 2}}; {entier = [1; 2]; node = {id = 3}}] *)
+
 (*Le pricipale de la fonction compressionParListe*)
 let compressionParListe arbre_decision =
-  let listeDejaVus = ref [] in
-  (***** to_do ****)
-  let rec aux arbre acc =
-    match arbre with
-      | Leaf (b)  -> acc 
-      | Node (depth,l,f) -> acc
-    in aux arbre_decision listeDejaVus
+  let listeDejaVus_ref = ref [] in
+  let rec aux arbre_decision =
+    let ge = liste_feuille_to_ge (liste_feuilles arbre_decision) in
+    match arbre_decision with
+    | Leaf (b) -> failwith "arbre_decision est une feuille"
+    | Node(depth,l,f) -> 
+        if check_ldv ge !listeDejaVus_ref then 
+        failwith "todo"
+
+        else  
+          let new_node = { id = 0 } in
+          let element = {entier = ge; node = new_node;} in
+          listeDejaVus_ref := (element) :: !listeDejaVus_ref
+  in aux arbre_decision
+
 
 
 
