@@ -48,6 +48,7 @@ let composition lb =
 (***test**)
 let listbool = [false;true;true];;
 composition listbool;; (* - : int = 6 *)
+composition [true;true] (*- : int = 3 *)
 (*  test correcte *)
 
 
@@ -259,6 +260,9 @@ let liste_feuilles_25899 = liste_feuilles dbt_25899
 
 
 (**********************Question 3.10 ********************)
+type decision_binary_tree =
+  | Leaf of bool
+  | Node of int * decision_binary_tree * decision_binary_tree
 
 type node = { depth: int;}
 
@@ -277,10 +281,101 @@ list_vide := 1 :: !list_vide;;  (** - : unit = () **)
 list_vide ;; (** - : int list ref = {contents = [1]} **)
 
 
+(** Préparation de la fonction compressionParListe**)
+
+(** 1. liste_feille_to_ge **)
+
+let rec sup_prefix0 l =
+  match l with
+    | [] -> []
+    | hd :: tl -> 
+      if hd = 0 then sup_prefix0 tl
+      else l 
+;;
+ (** test **)
+ sup_prefix0 [0;0;1;0;2;0];; (*[1; 0; 2; 0]*)
+ (** test correcte! **)
+ 
+let liste_feuille_to_ge lf =
+  let rec aux lf acc =  
+    let list_length = List.length lf in   
+    match list_length <= 64 with
+    | true -> List.rev ( sup_prefix0 ((composition lf) ::acc )) 
+    | false -> aux (List.rev (completion ((List.rev lf),(list_length - 64)))) ((composition (completion (lf,64))) ::acc)
+    (*** explication:  si length > 64, acc @ les premiers 64 ensuite on la reste sauf que les premiers 64 va continuer la récursive ***)
+  in aux lf [];;
+
+(** test liste_feuille_to_ge  est juste derrière que le test de ge_to_liste_feuille **)
+
+(** 2. ge_to_liste_feuille **)
+(** decomposition version num_liste **)
+let decomposition_ge ge_num_liste =
+  let rec aux ge_num_liste acc =
+  match ge_num_liste with
+    | [] -> acc
+    | [x] -> acc @ (decomposition x)
+    | hd :: tl ->  aux tl ( acc @ ( completion ((decomposition hd),64))) 
+  in aux ge_num_liste [];;
+
+(** test **)  
+decomposition_ge [1];; (*[true]*)
+decomposition_ge [2;1];; 
+(* [false; true; false; false; false; false; false; false; false; false;   10 éléments chaque ligne
+    false;false; false; false; false; false; false; false; false; false;
+    false; false;false; false; false; false; false; false; false; false;
+    false; false; false;false; false; false; false; false; false; false;
+    false; false; false; false;false; false; false; false; false; false; 
+    false; false; false; false; false; false;false; false; false; false;
+    false; false; false; false; true]  -->65 ème élément  *)
+
+(** test correct **)
+
+let ge_to_liste_feuille ge = liste_feuilles (cons_arbre (decomposition_ge ge));;
+
+(** test ge_to_liste_feuille **)
+ge_to_liste_feuille [2;1] ;;
+
+(* 
+[false; true; false; false; false; false; false; false; false; false; 
+ false;false; false; false; false; false; false; false; false; false; 
+ false; false;false; false; false; false; false; false; false; false; 
+ false; false; false;false; false; false; false; false; false; false; 
+ false; false; false; false;false; false; false; false; false; false;
+ false; false; false; false; false;false; false; false; false; false;
+ false; false; false; false; true; false; false; false; false; false; --> true c'est 65 éléments
+ false; false; false; false; false; false; false; false; false;false;
+ false; false; false; false; false; false; false; false; false;false; 
+ false; false; false; false; false; false; false; false; false;false; 
+ false; false; false; false; false; false; false; false; false;false;
+ false; false; false; false; false; false; false; false; false;false; 
+ false; false; false; false; false; false; false; false]  --> 128 élements*)
+
+ ge_to_liste_feuille [1] ;;
+
+
+(** test liste_feuille_to_ge **)
+
+List.length (ge_to_liste_feuille [1]);;                 (* 2 *)
+liste_feuille_to_ge (ge_to_liste_feuille [1]);;         (* - : int list = [1] *)
+List.length (ge_to_liste_feuille [2;1]);;               (* 128 *)
+liste_feuille_to_ge (ge_to_liste_feuille [2;1]);;       (* - : int list = [2;1] *)
+List.length (ge_to_liste_feuille [3;2;1]);;             (* 256 *)
+liste_feuille_to_ge (ge_to_liste_feuille [3;2;1]);;     (* - : int list = [3;2;1] *)
+List.length (ge_to_liste_feuille [4;3;2;1]);;           (* 256 *)
+List.length (ge_to_liste_feuille [5;4;3;2;1]);;         (* 512 *)
+liste_feuille_to_ge (ge_to_liste_feuille [5;4;3;2;1]);; (* - : int list = [5; 4; 3; 2; 1] *)
+
+ (** test correct **)
+
+(*Le pricipale de la fonction compressionParListe*)
 let compressionParListe arbre_decision =
   let listeDejaVus = ref [] in
   (***** to_do ****)
-  listeDejaVus, 1
+  let rec aux arbre acc =
+    match arbre with
+      | Leaf (b)  -> acc 
+      | Node (depth,l,f) -> acc
+    in aux arbre_decision listeDejaVus
 
 
 
