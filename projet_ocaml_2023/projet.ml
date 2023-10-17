@@ -75,41 +75,49 @@ let pow_rec_t a n =
 let genAlea n = 
   let rec aux n acc  =
     if n < 0 then acc
-    else if n < 64 then (decomposition (Int64.to_int (Random.int64 (Int64.of_int (pow_rec 2 n))))) :: acc
+    else if n < 32 then (decomposition (Int64.to_int (Random.int64 (Int64.of_int (pow_rec 2 n))))) :: acc
+    else if n >= 32 && n < 64 then 
+      (decomposition (Int64.to_int (Random.int64 (Int64.of_int (pow_rec 2 32))))) :: 
+      (decomposition (Int64.to_int (Random.int64 (Int64.of_int (pow_rec 2 (n-32)))))) 
+      :: acc    
+      (** Le code ci-dessus c'est pour résoudre le maximum valeur du type de int **)
     else aux (n-64) ((decomposition  (Int64.to_int (Random.int64 Int64.max_int)))::acc)
   in aux n []
+  
 
 let gen61 = (pow_rec 2 61)  (*int = 2305843009213693952*)
 let gen62 = (pow_rec 2 62)  (*int = -4611686018427387904*)
-
 let gen63 = (pow_rec 2 63)  (*int = 0*)
 (** test **)
 let ex_0 = genAlea 0   (*[[false]]*)
 let ex_61 = genAlea 61  (*[[false; false; false; true; false; false ;...; true]]*)
-let ex_62 = genAlea 62  (*Exception: Invalid_argument "Random.int64".*)
-let ex_63 = genAlea 63  (*Exception: Invalid_argument "Random.int64".*)
-let ex_64 = genAlea 64  (*[[false];
-                  [true; true; false; true; false; true; true; false; false; false; false; true;
-                  true; false; true; false; false; true; true; false; false; false; false;
-                  true; true; false; true; true; true; false; false; false; false; false;
-                  false; true; false; false; true; true; false; true; true; false; true; true;
-                  false; false; true; false; false; true; true; true; true; true; true; true]]*)
+let ex_62 = genAlea 62  (* [[true; false; false; true; false; true; false; true; false; false; true;
+                            false; true; true; true; false; false; false; true; false; true; false;
+                            true; true; true; false; false; true; true];
+                            [true; true; false; false; false; false; true; false; true; false; true;
+                            false; false; true; true; false; true; false; true; true; false; true;
+                            false; true; true; true; false; false; false; true]] *)
+let ex_63 = genAlea 63  (*[[true; true; true; true; false; true; true; false; false; false; false;
+                          false; true; true; true; true; false; false; false; false; true; true;
+                          true; true; false; false; false; false; true; true; false; true];
+                          [true; true; false; false; false; false; true; true; false; false; false;
+                          false; false; true; true; true; true; true; false; true; false  ; true; true;
+                          true; true; false; true; true; true]]*)
+let ex_64 = genAlea 64  (*[[false];[true; true; false; true; false; true; true; false; false; false; false; true;
+                          true; false; true; false; false; true; true; false; false; false; false;true; true; false;
+                          true; true; true; false; false; false; false; false;false; true; false; false; true; true; 
+                          false; true; true; false; true; true; false; false; true; false; false; true; true; true; 
+                          true; true; true; true]]*)
 let ex_100 = genAlea 100  (* [ [true; false; false; false; true; true; false; false; false; false; false;
-                      false; true; true; true; true; true; true; true; false; true; false; true;
-                      false; false; true; true; false; false; true; true; false; true];
+                              false; true; true; true; true; true; true; true; false; true; false; true;
+                              false; false; true; true; false; false; true; true; false; true];
                               [true; false; false; true; true; false; true; false; false; true; false; true;
                               true; true; true; true; false; true; true; false; false; false; false; false;
                               false; true; true; false; false; false; false; false; false; true; true;
                               true; true; true; true; true; true; false; true; true; true; false; true;
                               true; true; false; true; true; true; false; false; false; true; true; true;
                               true; true]]*)
-
-
-(*    test :
-    Pas complétement correcte,
-   En conclusion, 2^62 et 2^63 a déjà dépassé le maximum de type int.
-*)
-
+                              
 (**********************Question 2.7 ********************)
 type decision_binary_tree =
   | Leaf of bool
@@ -129,10 +137,10 @@ let rec log2_depth n =
 let depth_arbre lb = log2_depth (List.length lb)
 let cons_chemin_list lb =
   let length = List.length lb in
-  let rec aux lb n acc =
+  let rec aux lb cpt acc =
     match lb with
     | [] -> acc
-    | hd :: tl -> let com = List.rev (completion ( (decomposition n), log2_depth length) ) in aux tl (n+1) (  (com ,hd ) :: acc)
+    | hd :: tl -> let com = List.rev (completion ( (decomposition cpt), log2_depth length) ) in aux tl (cpt+1) (  (com ,hd ) :: acc)
     in  List.rev (aux lb 0 []) 
 
 (*  test *)
