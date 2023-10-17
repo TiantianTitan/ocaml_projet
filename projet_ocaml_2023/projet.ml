@@ -240,11 +240,8 @@ let liste_feuilles_25899 = liste_feuilles dbt_25899
 (*  test correcte *)
 
 (**********************Question 3.10 ********************)
-type decision_binary_tree =
-  | Leaf of bool
-  | Node of int * decision_binary_tree * decision_binary_tree
 
-type node = { id: int;}
+type node = { id: int; next_id: int; depth: int}
 
 type elements = { 
     entier: int list; 
@@ -360,14 +357,14 @@ let a = {
 }
 
 (* test *)
-let ex_node = {id = 0} 
+let ex_node = {id = 0; next_id = 1;depth = 1} 
 let ex_element = { entier = [1;2;3] ; node = ex_node ; } 
 let ex_ldv = [ex_element] 
 let ex_check1 = check_ldv [1;2;3] ex_ldv  (*true*)
 let ex_check2 = check_ldv [1;2] ex_ldv    (*false*)
 (* test correcte! *)
 
-let child_noeud elem l_ref =
+(* let child_noeud elem l_ref =
   let l = !l_ref in
   let rec aux l =
   match l with
@@ -375,57 +372,134 @@ let child_noeud elem l_ref =
   | hd :: tl -> 
     if hd.entier = elem then hd.node 
     else aux tl
-    in aux l
+    in aux l *)
 
- (** test **)
+ (** test child_noeud**)
 
-let ex_ldv_ref = ref [{entier = [1;2]; node = {id = 1}};{entier = [1;2;3]; node = {id = 2}}]
-let ex_child_noeud = child_noeud  [1;2] ex_ldv_ref
+(* let ex_ldv_ref = ref [{entier = [1;2]; node = {id = 1}};{entier = [1;2;3]; node = {id = 2}}]
+let ex_child_noeud = child_noeud  [1;2] ex_ldv_ref *)
+
+(** not test **)
 
 let maj_noeud elem noeud l_ref =
     let l = !l_ref in
-    let ret_ref = ref {id = -1} in
     let rec aux l acc=
       match l with
       | [] -> acc
       | { entier = e ;node = n } :: tl -> 
-        if e = elem then let _ = ret_ref := n  in
-        aux tl ({entier = e; node = noeud} :: acc)
+        if e = elem then aux tl ({entier = e; node = noeud} :: acc)
         else   aux tl ({ entier = e ;node = n } :: acc)
-    in let _ = l_ref :=  (aux l []) in !ret_ref
+    in let _ = l_ref :=  (aux l []) in ()
 
 (** test_maj_noeud **)
-let ex_ldv_ref = ref [{entier = [1;2]; node = {id = 1}};{entier = [1;2;3]; node = {id = 2}}]
-let ex_maj_noeud = maj_noeud [1;2] {id = 3} ex_ldv_ref
+let ex_ldv_ref = ref [{entier = [1;2]; node = {id = 1;next_id = 2; depth = 1}};{entier = [1;2;3]; node = {id = 2;next_id =3;depth = 2}}]
+let ex_maj_noeud = maj_noeud [1;2] {id = 3;next_id = 4;depth = 3} ex_ldv_ref
 
 let deja_maj = !ex_ldv_ref  (* [{entier = [1; 2; 3]; node = {id = 2}}; {entier = [1; 2]; node = {id = 3}}] *)
 (** test correcte! **)
 
-(* let maj_parent_noeud elem noeud l_ref =
-  let child_noeud = maj_noeud elem noeud l_ref in
-   *)
+let supprime_noeud id listeDejaVus_ref =
+  let l = !listeDejaVus_ref in
+  let rec aux l acc=
+    match l with
+      | [] -> acc
+      | { entier = e ;node = n } :: tl -> 
+        if n.id = id then aux tl acc
+        else aux tl ({ entier = e ;node = n } :: acc)
+  in aux l []
 
 
-(*Le pricipale de la fonction compressionParListe*)
+
+
+let maj_parent_noeud child_id next_correction l_ref =
+  let l = !l_ref in
+  let rec aux l acc =
+    match l with
+    | [] -> acc
+    | { entier = e; node = n } :: tl ->
+      if n.next_id = child_id then
+        aux tl ({ entier = e; node = { id = n.id; next_id = next_correction; depth = n.depth } } :: acc)
+      else
+        aux tl ({ entier = e; node = n } :: acc)
+  in let _ = l_ref := (aux l []) in ()
+    
+
+
 let compressionParListe arbre_decision =
   let listeDejaVus_ref = ref [] in
+  let num = ref 1 in
+
   let rec aux arbre_decision =
     let ge = liste_feuille_to_ge (liste_feuilles arbre_decision) in
     match arbre_decision with
-    | Leaf (b) -> ()
-    | Node(depth,l,r) -> 
-        if check_ldv ge !listeDejaVus_ref then 
-        let _ = maj_noeud ge {id = depth} listeDejaVus_ref in let _ = aux l in aux r   
-        else  
-          let new_node = { id = depth } in
-          let element = {entier = ge; node = new_node;} in
-          let _ =listeDejaVus_ref := (element) :: !listeDejaVus_ref in let _ = aux l in aux r
-  in let _ = aux arbre_decision in listeDejaVus_ref 
+    | Leaf b -> ()
+    | Node (depth, l, r) ->
+      if check_ldv ge !listeDejaVus_ref then
+        let _ = maj_parent_noeud (!num) (!num + 1) listeDejaVus_ref in
+        let _ = listeDejaVus_ref := supprime_noeud (!num) listeDejaVus_ref in
+        let _ = num := !num + 1 in
+        let _ = aux l in
+        aux r
+      else
+        let new_node = { id = !num; next_id = !num + 1; depth = depth } in
+        let element = { entier = ge; node = new_node } in
+        let _ = listeDejaVus_ref := element :: !listeDejaVus_ref in
+        let _ = num := !num + 1 in
+        let _ = aux l in
+        aux r
+  in
+  let _ = aux arbre_decision in
+  !listeDejaVus_ref
+
+
+  let rec is_left_true node =
+    match node with
+    | Leaf b -> b
+    | Node (_, _, right) -> is_left_true right
+
+  let compressionParListe arbre_decision =
+    let listeDejaVus = ref [] in
+  
+    let rec compress arbre =
+      match arbre with
+      | Leaf b -> arbre
+      | Node (depth, left, right) ->
+        let feuilles = liste_feuilles arbre_decision in
+        let n = liste_feuille_to_ge feuilles in
+  
+        (* Vérifie si le grand entier n est déjà dans la listeDejaVus *)
+        let find_in_list n =
+          let find_element e = e.entier = n in
+          List.find_opt find_element !listeDejaVus
+        in
+  
+        match find_in_list n with
+        | Some element ->
+          (* Règle-M : Remplace l'arête pointant vers l'actuel nœud par l'arête pointant vers l'élément correspondant *)
+          Node (depth, compress left, compress right)
+        | None ->
+          (* Ajoute le nœud actuel à la listeDejaVus *)
+          let new_node = { id = depth; next_id = -1; depth = depth } in
+          let new_element = { entier = n; node = new_node } in
+          let _ = listeDejaVus := new_element :: !listeDejaVus in
+  
+          (* Vérifie la règle Z *)
+          if is_left_true right then
+            (* Règle-Z : Remplace l'arête pointant vers l'actuel nœud par l'arête pointant vers le fils gauche *)
+            compress left
+          else
+            (* Conserve l'actuel nœud et continue la compression des sous-arbres *)
+            Node (depth, compress left, compress right)
+    in
+  
+    compress arbre_decision
+
+
 
 (** test **)
 let ex_25899 = decomposition 25899
 let dbt_25899 = cons_arbre ex_25899
-let test_compression_par_liste_25899 = let ret = compressionParListe dbt_25899 in !ret
+let test_compression_par_liste_25899 =  compressionParListe dbt_25899 
 
 
 (** test not end and try to understand l'algo ZDD **)
@@ -487,7 +561,12 @@ Node (1,
 
 
 
+(**********************Question 4.15 ********************)
+type graphe_node = { id: int; (* Autres informations liées au nœud *) }
 
+type arbre_deja_vus =
+  | Noeud of graphe_node * arbre_deja_vus * arbre_deja_vus
+  | Feuille
 
 
 
