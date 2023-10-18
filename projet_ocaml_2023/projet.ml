@@ -15,7 +15,7 @@ let decomposition num =
 
 (**    test   **)
 let ex_dec = decomposition(38) (*[false; true; true; false; false; true]*)
-(**    test correcte ! **)
+(**    test correct! ! **)
 
 (**********************Question 1.3 ********************)
 let completion couple =
@@ -30,7 +30,7 @@ let completion couple =
   (****    test  ****)
   let com_1 = completion([false; true; true; false; false; true], 4)   (*[false; true; true; false]*)
   let com_2 =  completion([false; true; true; false; false; true], 8)  (*[false; true; true; false; false; true; false; false]*)
-  (*  test correcte *)
+  (*  test correct! *)
 
 (**********************Question 1.4 ********************)
 let composition lb = 
@@ -45,7 +45,7 @@ let composition lb =
 let listbool = [false;true;true]
 let ex_com1 = composition listbool (* - : int = 6 *)
 let ex_com2 = composition [true;true] (*- : int = 3 *)
-(*  test correcte *)
+(*  test correct! *)
 
 
   
@@ -117,30 +117,31 @@ let ex_100 = genAlea 100  (* [ [true; false; false; false; true; true; false; fa
                               true; true; true; true; true; true; false; true; true; true; false; true;
                               true; true; false; true; true; true; false; false; false; true; true; true;
                               true; true]]*)
-                              
+(** test correct!**)                              
+
 (**********************Question 2.7 ********************)
 type decision_binary_tree =
   | Leaf of bool
   | Node of int * decision_binary_tree * decision_binary_tree
 
 (**********************Question 2.8 ********************)
-let rec log2_depth n =
+let rec log2_arete_pleine n =
   if n <= 0 then failwith "n <= 0"
   else if n = 1 || n = 2 then 1
-  else 1 + log2_depth ((n+1)/2)
+  else 1 + log2_arete_pleine ((n+1)/2)
 
 (** test: 
     log2 1 = 1; log2 2 = 1; log2 3= 2; log2 4= 2; log2 5 = 3; log2 8 = 3; log2 9 = 4
 **)
-(*  test correcte *)
+(*  test correct! *)
 
-let depth_arbre lb = log2_depth (List.length lb)
+let arete_pleine_arbre lb = log2_arete_pleine (List.length lb)
 let cons_chemin_list lb =
   let length = List.length lb in
   let rec aux lb cpt acc =
     match lb with
     | [] -> acc
-    | hd :: tl -> let com = List.rev (completion ( (decomposition cpt), log2_depth length) ) in aux tl (cpt+1) (  (com ,hd ) :: acc)
+    | hd :: tl -> let com = List.rev (completion ( (decomposition cpt), log2_arete_pleine length) ) in aux tl (cpt+1) (  (com ,hd ) :: acc)
     in  List.rev (aux lb 0 []) 
 
 (*  test *)
@@ -148,14 +149,14 @@ let chemin_list1 = cons_chemin_list [false;false;true]
 (* [([false; false], false); ([false; true], false); ([true; false], true)] *)
 let chemin_list2 = cons_chemin_list [true;false;true;true;true]
 (* [([false; false; false], true); ([false; false; true], false);([false; true; false], true); ([false; true; true], true);([true; false; false], true)] *)
-(*  test correcte *)
+(*  test correct! *)
 
 let cons_vide_arbre n =
   if n = 0 then failwith "Empty tree"
   else 
-    let rec constructor depth =
-      if depth = n+1 then Leaf(false)
-      else Node (depth, constructor (depth+1),constructor (depth+1))
+    let rec constructor arete_pleine =
+      if arete_pleine = n+1 then Leaf(false)
+      else Node (arete_pleine, constructor (arete_pleine+1),constructor (arete_pleine+1))
     in constructor 1
 
 let ex_tree = cons_vide_arbre 2  
@@ -170,12 +171,12 @@ let rec inserer chemin_bool arbre =
   else
   match arbre with
     | Leaf(_) -> Leaf(boolean)
-    | Node(depth,l,r) ->
+    | Node(arete_pleine,l,r) ->
         match chemin with
         | [] -> Leaf(boolean) 
         | hd :: tl -> 
-            if hd = false then Node(depth, inserer (tl,boolean) l,r)
-            else  Node(depth,l,inserer (tl,boolean) r)  
+            if hd = false then Node(arete_pleine, inserer (tl,boolean) l,r)
+            else  Node(arete_pleine,l,inserer (tl,boolean) r)  
 
 let ex_inserer = inserer ([false;false],true) (inserer ([true;false],true) ex_tree )  
 
@@ -183,12 +184,12 @@ let ex_inserer = inserer ([false;false],true) (inserer ([true;false],true) ex_tr
 (* insérer 1 leaf et 3 leaf*)
 (* val ex_inserer : decision_binary_tree =
   Node (1, Node (2, Leaf true, Leaf false), Node (2, Leaf true, Leaf false)) *)
-(*  test correcte *)
+(*  test correct! *)
 
 let cons_arbre lb = 
   let chemin_bool_list = cons_chemin_list lb in
-  let depth = depth_arbre lb in
-  let arbre_init = cons_vide_arbre depth in
+  let arete_pleine = arete_pleine_arbre lb in
+  let arbre_init = cons_vide_arbre arete_pleine in
   let rec inserer_list chemin_bool_list acc =
     match chemin_bool_list with
     | [] -> acc
@@ -211,7 +212,7 @@ let ex_cons_arbre2 = cons_arbre ex_list2
     Node (3, Node (4, Leaf false, Leaf false),
      Node (4, Leaf false, Leaf false)))) *)
 
-(*  test correcte *)
+(*  test correct! *)
 
 (********************** test de la question 2.8  --> 25899 ********************************)
 let ex_25899 = decomposition 25899
@@ -245,11 +246,11 @@ let liste_feuilles_25899 = liste_feuilles dbt_25899
       true; false; true; false; 
       false; true; true; false]  correcte!  *)
 
-(*  test correcte *)
+(*  test correct! *)
 
 (**********************Question 3.10 ********************)
 
-type node = { id: int; next_id: int; depth: int}
+type node = { id: int; arete_pointilles: int; arete_pleine: int; depth: int}
 
 type elements = { 
     entier: int list; 
@@ -277,7 +278,7 @@ let rec sup_prefix0 l =
 
  (** test **)
  let ex_sup_prefix0 = sup_prefix0 [0;0;1;0;2;0] (*[1; 0; 2; 0]*)
- (** test correcte! **)
+ (** test correct!! **)
  
 let liste_feuille_to_ge lf =
   let rec aux lf acc =  
@@ -365,29 +366,12 @@ let a = {
 }
 
 (* test *)
-let ex_node = {id = 0; next_id = 1;depth = 1} 
+let ex_node = {id = 0; arete_pointilles = 1;arete_pleine = 2; depth = 0} 
 let ex_element = { entier = [1;2;3] ; node = ex_node ; } 
 let ex_ldv = [ex_element] 
 let ex_check1 = check_ldv [1;2;3] ex_ldv  (*true*)
 let ex_check2 = check_ldv [1;2] ex_ldv    (*false*)
-(* test correcte! *)
-
-(* let child_noeud elem l_ref =
-  let l = !l_ref in
-  let rec aux l =
-  match l with
-  | [] -> failwith "no child with the node"
-  | hd :: tl -> 
-    if hd.entier = elem then hd.node 
-    else aux tl
-    in aux l *)
-
- (** test child_noeud**)
-
-(* let ex_ldv_ref = ref [{entier = [1;2]; node = {id = 1}};{entier = [1;2;3]; node = {id = 2}}]
-let ex_child_noeud = child_noeud  [1;2] ex_ldv_ref *)
-
-(** not test **)
+(* test correct!! *)
 
 let maj_noeud elem noeud l_ref =
     let l = !l_ref in
@@ -400,13 +384,13 @@ let maj_noeud elem noeud l_ref =
     in let _ = l_ref :=  (aux l []) in ()
 
 (** test_maj_noeud **)
-let ex_ldv_ref = ref [{entier = [1;2]; node = {id = 1;next_id = 2; depth = 1}};{entier = [1;2;3]; node = {id = 2;next_id =3;depth = 2}}]
-let ex_maj_noeud = maj_noeud [1;2] {id = 3;next_id = 4;depth = 3} ex_ldv_ref
+let ex_ldv_ref = ref [{entier = [1;2]; node = {id = 1;arete_pointilles = 2; arete_pleine = 3;depth = 1}};{entier = [1;2;3]; node = {id = 2;arete_pointilles =4;arete_pleine = 5; depth = 2}}]
+let ex_maj_noeud = maj_noeud [1;2] {id = 3;arete_pointilles = 10;arete_pleine = 11;depth = 3} ex_ldv_ref
 
 let deja_maj = !ex_ldv_ref  (* [{entier = [1; 2; 3]; node = {id = 2}}; {entier = [1; 2]; node = {id = 3}}] *)
-(** test correcte! **)
+(** test correct!! **)
 
-let supprime_noeud id listeDejaVus_ref =
+let supprime_element id listeDejaVus_ref =
   let l = !listeDejaVus_ref in
   let rec aux l acc=
     match l with
@@ -416,8 +400,10 @@ let supprime_noeud id listeDejaVus_ref =
         else aux tl ({ entier = e ;node = n } :: acc)
   in aux l []
 
-
-
+(** test **)
+let ex_supp_noeud = supprime_element 1 (ref [{entier = [1;2] ;node ={id = 1; arete_pointilles = 2; arete_pleine =3;depth = 1}};{entier = [1;2] ;node ={id = 2; arete_pointilles = 4; arete_pleine =5;depth = 2}}])
+(*[{entier = [1; 2]; node = {id = 2; arete_pointilles = 3; arete_pleine = 2}}]*)
+(** test correct! **)
 
 let maj_parent_noeud child_id next_correction l_ref =
   let l = !l_ref in
@@ -425,12 +411,61 @@ let maj_parent_noeud child_id next_correction l_ref =
     match l with
     | [] -> acc
     | { entier = e; node = n } :: tl ->
-      if n.next_id = child_id then
-        aux tl ({ entier = e; node = { id = n.id; next_id = next_correction; depth = n.depth } } :: acc)
+      if n.arete_pointilles = child_id then
+        aux tl ({ entier = e; node = { id = n.id; arete_pointilles = next_correction; arete_pleine = n.arete_pleine; depth = 1 (*to corriger*) } } :: acc)
       else
         aux tl ({ entier = e; node = n } :: acc)
   in let _ = l_ref := (aux l []) in ()
     
+(** test **)
+let ex_list_ref = ref [{entier = [1;2] ;node ={id = 1; arete_pointilles = 2; arete_pleine =3;depth = 1}};
+                       {entier = [1;2] ;node ={id = 2; arete_pointilles = 5; arete_pleine =7;depth = 2}}]
+let ex_maj_parent_noeud = let _ = maj_parent_noeud 2 100 ex_list_ref in  !ex_list_ref
+(* [{entier = [1; 2]; node = {id = 2; arete_pointilles = 3; arete_pleine = 2}};
+    {entier = [1; 2]; node = {id = 1; arete_pointilles = 100; arete_pleine = 1}}] *)
+(** test correct! **)
+
+
+let destruire_a_en_niveau_n arbre_decision n =
+  let rec aux cpt arbre_decision acc= 
+    match arbre_decision with
+    | Leaf (b) -> failwith "utilisation: depth n est trop grand"
+    | Node (depth, l ,r) -> 
+      if cpt <> n then aux (cpt+1) r (aux (cpt+1) l acc)
+      else arbre_decision :: acc
+    in aux 1 arbre_decision [] 
+
+(** test **)
+let ex_arbre = cons_arbre (decomposition 25899)
+let ex_niveau_2_liste = destruire_a_en_niveau_n ex_arbre 2
+(* [Node (2,
+        Node (3, Node (4, Leaf true, Leaf false), Node (4, Leaf true, Leaf false)),
+        Node (3, Node (4, Leaf false, Leaf true), Node (4, Leaf true, Leaf false)));
+    Node (2,
+        Node (3, Node (4, Leaf true, Leaf true), Node (4, Leaf false, Leaf true)),
+        Node (3, Node (4, Leaf false, Leaf true), Node (4, Leaf false, Leaf false)))] *)
+let ex_niveau_3_liste = destruire_a_en_niveau_n ex_arbre 3
+(* [Node (3, Node (4, Leaf false, Leaf true), Node (4, Leaf true, Leaf false));
+    Node (3, Node (4, Leaf true, Leaf false), Node (4, Leaf true, Leaf false));
+    Node (3, Node (4, Leaf false, Leaf true), Node (4, Leaf false, Leaf false));
+    Node (3, Node (4, Leaf true, Leaf true), Node (4, Leaf false, Leaf true))] *)
+let ex_niveau_4_liste = destruire_a_en_niveau_n ex_arbre 4
+(* [Node (4, Leaf true, Leaf false); Node (4, Leaf false, Leaf true);
+    Node (4, Leaf true, Leaf false); Node (4, Leaf true, Leaf false);
+    Node (4, Leaf false, Leaf false); Node (4, Leaf false, Leaf true);
+    Node (4, Leaf false, Leaf true); Node (4, Leaf true, Leaf true)] *)
+(** test correct! **)
+
+
+
+
+let compression arbre_decision =
+  let listeDejaVus_ref = ref [] in
+  let num = ref 1 in failwith "todo"
+
+(* on a besoin d'utiliser le programmation dynamique pour trouver la chaine plus longue pareilement dans une liste*)
+
+
 
 
 let compressionParListe arbre_decision =
@@ -441,15 +476,15 @@ let compressionParListe arbre_decision =
     let ge = liste_feuille_to_ge (liste_feuilles arbre_decision) in
     match arbre_decision with
     | Leaf b -> ()
-    | Node (depth, l, r) ->
+    | Node (arete_pleine, l, r) ->
       if check_ldv ge !listeDejaVus_ref then
         let _ = maj_parent_noeud (!num) (!num + 1) listeDejaVus_ref in
-        let _ = listeDejaVus_ref := supprime_noeud (!num) listeDejaVus_ref in
+        let _ = listeDejaVus_ref := supprime_element (!num) listeDejaVus_ref in
         let _ = num := !num + 1 in
         let _ = aux l in
         aux r
       else
-        let new_node = { id = !num; next_id = !num + 1; depth = depth } in
+        let new_node = { id = !num; arete_pointilles = !num + 1; arete_pleine = arete_pleine } in
         let element = { entier = ge; node = new_node } in
         let _ = listeDejaVus_ref := element :: !listeDejaVus_ref in
         let _ = num := !num + 1 in
@@ -458,51 +493,6 @@ let compressionParListe arbre_decision =
   in
   let _ = aux arbre_decision in
   !listeDejaVus_ref
-
-
-  let rec is_left_true node =
-    match node with
-    | Leaf b -> b
-    | Node (_, _, right) -> is_left_true right
-
-  let compressionParListe arbre_decision =
-    let listeDejaVus = ref [] in
-  
-    let rec compress arbre =
-      match arbre with
-      | Leaf b -> arbre
-      | Node (depth, left, right) ->
-        let feuilles = liste_feuilles arbre_decision in
-        let n = liste_feuille_to_ge feuilles in
-  
-        (* Vérifie si le grand entier n est déjà dans la listeDejaVus *)
-        let find_in_list n =
-          let find_element e = e.entier = n in
-          List.find_opt find_element !listeDejaVus
-        in
-  
-        match find_in_list n with
-        | Some element ->
-          (* Règle-M : Remplace l'arête pointant vers l'actuel nœud par l'arête pointant vers l'élément correspondant *)
-          Node (depth, compress left, compress right)
-        | None ->
-          (* Ajoute le nœud actuel à la listeDejaVus *)
-          let new_node = { id = depth; next_id = -1; depth = depth } in
-          let new_element = { entier = n; node = new_node } in
-          let _ = listeDejaVus := new_element :: !listeDejaVus in
-  
-          (* Vérifie la règle Z *)
-          if is_left_true right then
-            (* Règle-Z : Remplace l'arête pointant vers l'actuel nœud par l'arête pointant vers le fils gauche *)
-            compress left
-          else
-            (* Conserve l'actuel nœud et continue la compression des sous-arbres *)
-            Node (depth, compress left, compress right)
-    in
-  
-    compress arbre_decision
-
-
 
 (** test **)
 let ex_25899 = decomposition 25899
@@ -525,6 +515,8 @@ let () =
   let oc =open_out file_test in
   Printf.fprintf oc "%s\n" message;
   close_out oc
+
+(** L'exemple est dans le ficher test.dot **)
 
 
 (** l'implémentation de sémantique de dot **)
@@ -570,10 +562,10 @@ Node (1,
 
 
 (**********************Question 4.15 ********************)
-type graphe_node = { id: int; (* Autres informations liées au nœud *) }
+type node = { id: int; (* Autres informations liées au nœud *) }
 
 type arbre_deja_vus =
-  | Noeud of graphe_node * arbre_deja_vus * arbre_deja_vus
+  | Noeud of node * arbre_deja_vus * arbre_deja_vus
   | Feuille
 
 
