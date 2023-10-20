@@ -125,23 +125,23 @@ type decision_binary_tree =
   | Node of int * decision_binary_tree * decision_binary_tree
 
 (**********************Question 2.8 ********************)
-let rec log2_arete_pleine n =
+let rec log2_arete n =
   if n <= 0 then failwith "n <= 0"
   else if n = 1 || n = 2 then 1
-  else 1 + log2_arete_pleine ((n+1)/2)
+  else 1 + log2_arete ((n+1)/2)
 
 (** test: 
     log2 1 = 1; log2 2 = 1; log2 3= 2; log2 4= 2; log2 5 = 3; log2 8 = 3; log2 9 = 4
 **)
 (*  test correct! *)
 
-let arete_pleine_arbre lb = log2_arete_pleine (List.length lb)
+let arete_arbre lb = log2_arete (List.length lb)
 let cons_chemin_list lb =
   let length = List.length lb in
   let rec aux lb cpt acc =
     match lb with
     | [] -> acc
-    | hd :: tl -> let com = List.rev (completion ( (decomposition cpt), log2_arete_pleine length) ) in aux tl (cpt+1) (  (com ,hd ) :: acc)
+    | hd :: tl -> let com = List.rev (completion ( (decomposition cpt), log2_arete length) ) in aux tl (cpt+1) (  (com ,hd ) :: acc)
     in  List.rev (aux lb 0 []) 
 
 (*  test *)
@@ -154,9 +154,9 @@ let chemin_list2 = cons_chemin_list [true;false;true;true;true]
 let cons_vide_arbre n =
   if n = 0 then failwith "Empty tree"
   else 
-    let rec constructor arete_pleine =
-      if arete_pleine = n+1 then Leaf(false)
-      else Node (arete_pleine, constructor (arete_pleine+1),constructor (arete_pleine+1))
+    let rec constructor arete =
+      if arete = n+1 then Leaf(false)
+      else Node (arete, constructor (arete+1),constructor (arete+1))
     in constructor 1
 
 let ex_tree = cons_vide_arbre 2  
@@ -171,12 +171,12 @@ let rec inserer chemin_bool arbre =
   else
   match arbre with
     | Leaf(_) -> Leaf(boolean)
-    | Node(arete_pleine,l,r) ->
+    | Node(arete,l,r) ->
         match chemin with
         | [] -> Leaf(boolean) 
         | hd :: tl -> 
-            if hd = false then Node(arete_pleine, inserer (tl,boolean) l,r)
-            else  Node(arete_pleine,l,inserer (tl,boolean) r)  
+            if hd = false then Node(arete, inserer (tl,boolean) l,r)
+            else  Node(arete,l,inserer (tl,boolean) r)  
 
 let ex_inserer = inserer ([false;false],true) (inserer ([true;false],true) ex_tree )  
 
@@ -188,8 +188,8 @@ let ex_inserer = inserer ([false;false],true) (inserer ([true;false],true) ex_tr
 
 let cons_arbre lb = 
   let chemin_bool_list = cons_chemin_list lb in
-  let arete_pleine = arete_pleine_arbre lb in
-  let arbre_init = cons_vide_arbre arete_pleine in
+  let arete = arete_arbre lb in
+  let arbre_init = cons_vide_arbre arete in
   let rec inserer_list chemin_bool_list acc =
     match chemin_bool_list with
     | [] -> acc
@@ -250,7 +250,9 @@ let liste_feuilles_25899 = liste_feuilles dbt_25899
 
 (**********************Question 3.10 ********************)
 
-type node = { id: int; arete_pointilles: int; arete_pleine: int; depth: int}
+type arete_type = Pointilles | Pleine | Null
+
+type node = { id: int; next_id_l: int; next_id_r : int; arete: arete_type ; depth: int}
 
 type elements = { 
     entier: int list; 
@@ -366,7 +368,7 @@ let a = {
 }
 
 (* test *)
-let ex_node = {id = 0; arete_pointilles = 1;arete_pleine = 2; depth = 0} 
+let ex_node = {id = 0; next_id_l = 1; next_id_r = 2 ;arete = Null; depth = 0} 
 let ex_element = { entier = [1;2;3] ; node = ex_node ; } 
 let ex_ldv = [ex_element] 
 let ex_check1 = check_ldv [1;2;3] ex_ldv  (*true*)
@@ -384,8 +386,8 @@ let maj_noeud elem noeud l_ref =
     in let _ = l_ref :=  (aux l []) in ()
 
 (** test_maj_noeud **)
-let ex_ldv_ref = ref [{entier = [1;2]; node = {id = 1;arete_pointilles = 2; arete_pleine = 3;depth = 1}};{entier = [1;2;3]; node = {id = 2;arete_pointilles =4;arete_pleine = 5; depth = 2}}]
-let ex_maj_noeud = maj_noeud [1;2] {id = 3;arete_pointilles = 10;arete_pleine = 11;depth = 3} ex_ldv_ref
+let ex_ldv_ref = ref [{entier = [1;2]; node = {id = 1;next_id_l = 2; next_id_r = 3;arete = Null;depth = 1}};{entier = [1;2;3]; node = {id = 2;next_id_l =4; next_id_r = 7;arete = Null; depth = 2}}]
+let ex_maj_noeud = maj_noeud [1;2] {id = 3;next_id_l = 10; next_id_r = 13;arete = Null;depth = 3} ex_ldv_ref
 
 let deja_maj = !ex_ldv_ref  (* [{entier = [1; 2; 3]; node = {id = 2}}; {entier = [1; 2]; node = {id = 3}}] *)
 (** test correct!! **)
@@ -401,28 +403,52 @@ let supprime_element id listeDejaVus_ref =
   in aux l []
 
 (** test **)
-let ex_supp_noeud = supprime_element 1 (ref [{entier = [1;2] ;node ={id = 1; arete_pointilles = 2; arete_pleine =3;depth = 1}};{entier = [1;2] ;node ={id = 2; arete_pointilles = 4; arete_pleine =5;depth = 2}}])
-(*[{entier = [1; 2]; node = {id = 2; arete_pointilles = 3; arete_pleine = 2}}]*)
+let ex_supp_noeud = supprime_element 1 (ref [{entier = [1;2] ;node ={id = 1; next_id_l = 2; next_id_r = 7; arete =Null;depth = 1}};{entier = [1;2] ;node ={id = 2; next_id_l = 4; next_id_r = 8;arete =Null;depth = 2}}])
+(*[{entier = [1; 2]; node = {id = 2; next_id_l = 3; arete = 2}}]*)
 (** test correct! **)
 
-let maj_parent_noeud child_id next_correction l_ref =
+
+let get_id_ge_ldv ge l_ref =
+  let l = !l_ref in
+  let rec aux l  =
+    match l with
+    | [] -> failwith "Not find ge in the list"
+    | { entier = e; node = n } :: tl -> 
+    if ge = e then n.id
+    else aux tl
+  in aux l
+
+let maj_parent_noeud_l child_id next_correction l_ref =
   let l = !l_ref in
   let rec aux l acc =
     match l with
     | [] -> acc
     | { entier = e; node = n } :: tl ->
-      if n.arete_pointilles = child_id then
-        aux tl ({ entier = e; node = { id = n.id; arete_pointilles = next_correction; arete_pleine = n.arete_pleine; depth = 1 (*to corriger*) } } :: acc)
+      if n.next_id_l = child_id then
+        aux tl ({ entier = e; node = { id = n.id; next_id_l = next_correction; next_id_r = n.next_id_r; arete = n.arete; depth = n.depth } } :: acc)
       else
         aux tl ({ entier = e; node = n } :: acc)
   in let _ = l_ref := (aux l []) in ()
-    
+
+let maj_parent_noeud_r child_id next_correction l_ref =
+  let l = !l_ref in
+  let rec aux l acc =
+    match l with
+    | [] -> acc
+    | { entier = e; node = n } :: tl ->
+      if n.next_id_l = child_id then
+        aux tl ({ entier = e; node = { id = n.id; next_id_l = next_correction; next_id_r = n.next_id_r; arete = n.arete; depth = n.depth } } :: acc)
+      else
+        aux tl ({ entier = e; node = n } :: acc)
+  in let _ = l_ref := (aux l []) in ()
+  
 (** test **)
-let ex_list_ref = ref [{entier = [1;2] ;node ={id = 1; arete_pointilles = 2; arete_pleine =3;depth = 1}};
-                       {entier = [1;2] ;node ={id = 2; arete_pointilles = 5; arete_pleine =7;depth = 2}}]
-let ex_maj_parent_noeud = let _ = maj_parent_noeud 2 100 ex_list_ref in  !ex_list_ref
-(* [{entier = [1; 2]; node = {id = 2; arete_pointilles = 3; arete_pleine = 2}};
-    {entier = [1; 2]; node = {id = 1; arete_pointilles = 100; arete_pleine = 1}}] *)
+let ex_list_ref = ref [{entier = [1;2] ;node ={id = 1; next_id_l = 2; next_id_r = 3; arete =Null;depth = 1}};
+                       {entier = [1;2;3] ;node ={id = 2; next_id_l = 5;next_id_r = 7; arete =Pointilles;depth = 2}}]
+let ex_get_id_ge_ldv = get_id_ge_ldv [1;2] ex_list_ref
+let ex_maj_parent_noeud_l = let _ = maj_parent_noeud_l 2 100 ex_list_ref in  !ex_list_ref
+(* [{entier = [1; 2]; node = {id = 2; next_id_l = 3; arete = 2}};
+    {entier = [1; 2]; node = {id = 1; next_id_l = 100; arete = 1}}] *)
 (** test correct! **)
 
 
@@ -459,11 +485,6 @@ let ex_niveau_4_liste = destruire_a_en_niveau_n ex_arbre 4
 
 
 
-let compression arbre_decision =
-  let listeDejaVus_ref = ref [] in
-  let num = ref 1 in failwith "todo"
-
-(* on a besoin d'utiliser le programmation dynamique pour trouver la chaine plus longue pareilement dans une liste*)
 
 
 
@@ -471,12 +492,48 @@ let compression arbre_decision =
 let compressionParListe arbre_decision =
   let listeDejaVus_ref = ref [] in
   let num = ref 1 in
+  let rec aux arbre_decision direction =
+    let ge = liste_feuille_to_ge (liste_feuilles arbre_decision) in
+    match arbre_decision with
+    | Leaf b -> failwith "Wont reach here"
+    | Node (depth, Leaf(a), Leaf(b)) -> arbre_decision (*failwith "todo"*)
+    | Node (depth, l, r) ->
+    if check_ldv ge !listeDejaVus_ref then 
+      if direction = Pointilles then 
+        let _ = maj_parent_noeud_l (!num) (get_id_ge_ldv ge listeDejaVus_ref) listeDejaVus_ref in 
+        let _ = aux l Pointilles in aux r Pleine
+      else 
+        let _ = maj_parent_noeud_r (!num) (get_id_ge_ldv ge listeDejaVus_ref) listeDejaVus_ref in
+        let _ = aux l Pointilles in aux r Pleine 
+    else 
+      if direction = Pointilles then 
+      let new_node = { id = !num; next_id_l = !num + 1; next_id_r = -1;arete = direction ; depth = depth} in
+        let element = { entier = ge; node = new_node } in
+        let _ = listeDejaVus_ref := element :: !listeDejaVus_ref in
+        let _ = num := !num + 1 in
+        let _ = aux l Pointilles in 
+        aux r Pleine
+      else    let new_node = { id = !num; next_id_l = -1 ; next_id_r = !num + 1;arete = direction ; depth = depth} in
+      let element = { entier = ge; node = new_node } in
+      let _ = listeDejaVus_ref := element :: !listeDejaVus_ref in
+      let _ = num := !num + 1 in
+      let _ = aux l Pointilles in 
+      aux r Pleine
+    in let _ = (aux arbre_decision Null) in !listeDejaVus_ref
+(* on a besoin d'utiliser le programmation dynamique pour trouver la chaine plus longue pareilement dans une liste*)
+
+
+
+
+(* let compressionParListe arbre_decision =
+  let listeDejaVus_ref = ref [] in
+  let num = ref 1 in
 
   let rec aux arbre_decision =
     let ge = liste_feuille_to_ge (liste_feuilles arbre_decision) in
     match arbre_decision with
     | Leaf b -> ()
-    | Node (arete_pleine, l, r) ->
+    | Node (depth, l, r) ->
       if check_ldv ge !listeDejaVus_ref then
         let _ = maj_parent_noeud (!num) (!num + 1) listeDejaVus_ref in
         let _ = listeDejaVus_ref := supprime_element (!num) listeDejaVus_ref in
@@ -484,7 +541,7 @@ let compressionParListe arbre_decision =
         let _ = aux l in
         aux r
       else
-        let new_node = { id = !num; arete_pointilles = !num + 1; arete_pleine = arete_pleine } in
+        let new_node = { id = !num; next_id_l = !num + 1; arete = Null ; depth = depth} in
         let element = { entier = ge; node = new_node } in
         let _ = listeDejaVus_ref := element :: !listeDejaVus_ref in
         let _ = num := !num + 1 in
@@ -492,7 +549,7 @@ let compressionParListe arbre_decision =
         aux r
   in
   let _ = aux arbre_decision in
-  !listeDejaVus_ref
+  !listeDejaVus_ref *)
 
 (** test **)
 let ex_25899 = decomposition 25899
