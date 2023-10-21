@@ -60,7 +60,7 @@ let tab3 = table 5 8   (*[true; false; true; false; false; false; false; false]*
 (**********************Question 1.6 ********************)
 
 (*récursive*)
-let rec pow_rec a n =
+let rec pow_rec a n = 
   if n = 0 then 1
   else a* (pow_rec a (n-1))
 

@@ -164,53 +164,76 @@ let maj_noeud_l node_ref ge liste_ref =
 
   let compressionParListe arbre_decision =
     let listeDejaVus_ref = ref [] in
-    let new_element_t = {entier = [-1]; node_l = ref {id = [-1];depth = -1}; node_r = ref {id = [-1];depth = -1}} in
-    let new_element_f = {entier = [-2]; node_l = ref {id = [-2];depth = -1}; node_r = ref {id = [-2];depth = -1}} in
+    let new_element_t = {entier = [-1]; node_l = ref {id = [];depth = -1}; node_r = ref {id = [];depth = -1}} in
+    let new_element_f = {entier = [-2]; node_l = ref {id = [];depth = -1}; node_r = ref {id = [];depth = -1}} in
     let _ = listeDejaVus_ref := new_element_t :: new_element_f :: !listeDejaVus_ref in
        
     let rec aux ad =
       let ge = liste_feuille_to_ge (liste_feuilles ad) in
       match ad with
       | Leaf b -> failwith "Wont reach here"
-      | Node (d, Leaf(a), Leaf(b)) -> 
-        let _ =
-        if b = false && a = true then  
-            let _ = maj_noeud_l (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in
-            let _ = maj_noeud_r (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref  in ()
-        in
-        let _ = if a then let _ =  maj_noeud_l (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in () else let _ = maj_noeud_l (get_ref_noeud [-2] listeDejaVus_ref) ge listeDejaVus_ref in ()
-        in if b then let _ = maj_noeud_r (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in () else let _ = maj_noeud_r (get_ref_noeud [-2] listeDejaVus_ref) ge listeDejaVus_ref in () 
-
-    | Node (d, l, r) -> 
+      | Node (d,Leaf(true),Leaf(false)) ->
+        if check_ldv ge !listeDejaVus_ref then
+          let _ = maj_noeud_l (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in
+          let _ = maj_noeud_l (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in ()
+        else  let new_node_l = {id = [-1] ;depth = d} in let new_node_r = {id = [-1] ;depth = d} in
+          let new_element = {entier = ge; node_l = ref new_node_l;node_r = ref new_node_r} in
+          let _ = listeDejaVus_ref := new_element :: !listeDejaVus_ref in ()
+      | Node (d,Leaf(false),Leaf(false)) ->
+        if check_ldv ge !listeDejaVus_ref then
+          let _ = maj_noeud_l (get_ref_noeud [-2] listeDejaVus_ref) ge listeDejaVus_ref in
+          let _ = maj_noeud_l (get_ref_noeud [-2] listeDejaVus_ref) ge listeDejaVus_ref in()
+        else  let new_node_l = {id = [-2] ;depth = d} in let new_node_r = {id = [-2] ;depth = d} in
+          let new_element = {entier = ge; node_l = ref new_node_l;node_r = ref new_node_r} in
+          let _ = listeDejaVus_ref := new_element :: !listeDejaVus_ref in ()
+      | Node (d,Leaf(false),Leaf(true)) ->
+        if check_ldv ge !listeDejaVus_ref then
+          let _ = maj_noeud_l (get_ref_noeud [-2] listeDejaVus_ref) ge listeDejaVus_ref in
+          let _ = maj_noeud_l (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in ()
+        else  let new_node_l = {id = [-2] ;depth = d} in let new_node_r = {id = [-1] ;depth = d} in
+          let new_element = {entier = ge; node_l = ref new_node_l;node_r = ref new_node_r} in
+          let _ = listeDejaVus_ref := new_element :: !listeDejaVus_ref in ()
+      | Node (d,Leaf(true),Leaf(true)) ->
+        if check_ldv ge !listeDejaVus_ref then
+          let _ = maj_noeud_l (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in
+          let _ = maj_noeud_l (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in ()
+        else  let new_node_l = {id = [-1] ;depth = d} in let new_node_r = {id = [-1] ;depth = d} in
+          let new_element = {entier = ge; node_l = ref new_node_l;node_r = ref new_node_r} in
+          let _ = listeDejaVus_ref := new_element :: !listeDejaVus_ref in ()
+      | Node (d, l, r) -> 
         let ge_l = liste_feuille_to_ge (liste_feuilles l) in 
         let ge_r = liste_feuille_to_ge (liste_feuilles r) in
-        
         let _ =
-        if check_ldv ge_l !listeDejaVus_ref then
-        let _ = maj_noeud_l (get_ref_noeud ge_l listeDejaVus_ref) ge listeDejaVus_ref in let _ = aux l in aux r
-        in
+        if not (check_ldv ge_l !listeDejaVus_ref) && not (check_ldv ge_r !listeDejaVus_ref) then 
+          let new_node_l = {id = ge_l ;depth = d} in
+          let new_node_r = {id = ge_r ;depth = d} in
+          let new_element = {entier = ge; node_l = ref new_node_l;node_r = ref new_node_r} in
+          let _ = listeDejaVus_ref := new_element :: !listeDejaVus_ref in ()
+        else if check_ldv ge_l !listeDejaVus_ref && check_ldv ge_r !listeDejaVus_ref then
+          let _ = maj_noeud_l (get_ref_noeud ge_l listeDejaVus_ref) ge listeDejaVus_ref in 
+          let _ = maj_noeud_r   (get_ref_noeud ge_r listeDejaVus_ref) ge listeDejaVus_ref in 
+          let _ = aux l in aux r
+        else if check_ldv ge_l !listeDejaVus_ref then 
+          let new_node_r = {id = ge_r ;depth = d} in
+          let new_element = {entier = ge; node_l = ref {id = [-1];depth = d+1};node_r = ref new_node_r} in
+          let _ = listeDejaVus_ref := new_element :: !listeDejaVus_ref in 
+          let _ = maj_noeud_l (get_ref_noeud ge_l listeDejaVus_ref) ge listeDejaVus_ref in ()
+        else if  check_ldv ge_r !listeDejaVus_ref then
+          let new_node_l = {id = ge_r ;depth = d} in
+          let new_element = {entier = ge; node_l = ref new_node_l ;node_r =ref {id = [-1];depth = d+1} } in
+          let _ = listeDejaVus_ref := new_element :: !listeDejaVus_ref in 
+          let _ = maj_noeud_r   (get_ref_noeud ge_r listeDejaVus_ref) ge listeDejaVus_ref in let _ = aux l in aux r
         
-        let _ =
-        if check_ldv ge_r !listeDejaVus_ref then 
-        let _ = maj_noeud_r (get_ref_noeud ge_r listeDejaVus_ref) ge listeDejaVus_ref in let _ = aux l in aux r
         in
-
-
-        let new_node_l = {id = ge_l ;depth = d} in
-        let new_node_r = {id = ge_r ;depth = d} in
-        let new_element = {entier = ge; node_l = ref new_node_l;node_r = ref new_node_r} in
-        let _ = listeDejaVus_ref := new_element :: !listeDejaVus_ref in
         let _ = aux l in aux r
     in  let _ = (aux arbre_decision) in !listeDejaVus_ref
-
-
-
 
 
     let ex_25899 = decomposition 25899
     let dbt_25899 = cons_arbre ex_25899
 
     let arbre_compress = compressionParListe dbt_25899 
+
 
 
 
