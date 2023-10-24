@@ -525,17 +525,12 @@ let compressionParListe arbre_decision =
   let _ = ge1_to_bltrue ldv_ref in
   !ldv_ref
 
-
-
-
-
 (** test **)
 let ex_25899 = decomposition 25899
 let dbt_25899 = cons_arbre ex_25899
 let test_compression_par_liste_25899 =  compressionParListe dbt_25899 
 
 
-(** test not end and try to understand l'algo ZDD **)
 
 
 
@@ -543,7 +538,7 @@ let test_compression_par_liste_25899 =  compressionParListe dbt_25899
 (**********************Question 3.12 ********************)
 
 (** Utilisation de ficher en ocaml **)
-let file_test = "./projet_ocaml_2023/test.dot"
+let file_test = "./test.dot"
 
 let () = 
   let message = "hello world\ntest\n" in
@@ -553,18 +548,60 @@ let () =
 
 (** L'exemple est dans le ficher test.dot **)
 
+(** L'excercice ci-dessous c'est pour ge < 2 pow 64  **)
+
+let ge_to_int ge=
+  match ge with
+  | GE (il) ->
+    (match il with
+    | [] -> failwith "no number" 
+    | hd :: tl ->  hd)
+  | _ -> failwith "not ge it's bl"
+
+let bool_to_string b =
+  if b then "true"
+  else "false"
+
+let node_id_to_string node_id =
+  match node_id with
+   | BL(b) -> bool_to_string b
+   | GE (ge) -> string_of_int (ge_to_int (GE (ge) ))
+
+let test_il_to_s = ge_to_int (GE[3;4;2;1]) (*3 correct*)
 
 (** l'implémentation de sémantique de dot **)
 (* let cons_graphe_dot arbre_de_decision = "TEST\n" *)
-let cons_graphe_dot arbre_de_decision = failwith "todo"
+let cons_graphe_dot_string_liste arbre_de_decision = 
+  let elements_liste = compressionParListe arbre_de_decision  in
+  let graphe_string_liste = ref [] in
+  let rec aux el =
+    match el with
+    | [] -> !graphe_string_liste
+    | hd :: tl -> let _ = graphe_string_liste := 
+    ((node_id_to_string hd.entier) ^ " -- " ^ node_id_to_string (!(hd.node_l).id) ^ " [style=dotted]") :: 
+    ((node_id_to_string hd.entier) ^ " -- " ^ node_id_to_string (!(hd.node_r).id)) :: 
+    !graphe_string_liste 
+    in aux tl
+  in aux elements_liste
+
+let test_cons_graphe_dot_string_liste = cons_graphe_dot_string_liste dbt_25899
+
 
 (** Le principale de construction d'un ficher dot **)    
-let file_graphe = "./projet_ocaml_2023/graphe.dot"
+let file_graphe = "./graphe.dot"
 let dot fichier arbre_de_decision = 
-  let _ = () in 
-    let graphe = cons_graphe_dot arbre_de_decision in
+  let _ = () in   
+  let head = "graph {" in
+  let tail = "}" in
+  let s_list = cons_graphe_dot_string_liste arbre_de_decision in
     let oc = open_out file_graphe in
-    Printf.fprintf oc "%s\n" graphe;
+    let _ = Printf.fprintf oc "%s\n" head in (*graph {*)
+    let rec aux s_list =
+      match s_list with
+      | [] -> ()
+      | hd :: tl -> let _ = Printf.fprintf oc "%s\n" hd in aux tl
+    in let _ = aux s_list in
+    let _ = Printf.fprintf oc "%s" tail in (*}*)
     close_out oc
     
 let test_graphe = dot file_graphe dbt_25899
