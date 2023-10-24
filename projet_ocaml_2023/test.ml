@@ -157,7 +157,9 @@ let maj_noeud_l node_ref ge liste_ref =
     match liste with
     | [] -> failwith "ge n'est pas dans la liste"
     | { entier = e; node_l = n_l; node_r = n_r } :: tl -> 
-    if (!n_l).id = ge then n_l
+    if e = [-1] then   ref {id = [-1]; depth = -1}
+    else if e = [-2] then   ref {id = [-2]; depth = -1}
+    else if (!n_l).id = ge then n_l
     else if  (!n_r).id = ge then n_r
     else get_ref_noeud ge (ref tl)
 
@@ -175,28 +177,28 @@ let maj_noeud_l node_ref ge liste_ref =
       | Node (d,Leaf(true),Leaf(false)) ->
         if check_ldv ge !listeDejaVus_ref then
           let _ = maj_noeud_l (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in
-          let _ = maj_noeud_l (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in ()
+          let _ = maj_noeud_r (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in ()
         else  let new_node_l = {id = [-1] ;depth = d} in let new_node_r = {id = [-1] ;depth = d} in
           let new_element = {entier = ge; node_l = ref new_node_l;node_r = ref new_node_r} in
           let _ = listeDejaVus_ref := new_element :: !listeDejaVus_ref in ()
       | Node (d,Leaf(false),Leaf(false)) ->
         if check_ldv ge !listeDejaVus_ref then
           let _ = maj_noeud_l (get_ref_noeud [-2] listeDejaVus_ref) ge listeDejaVus_ref in
-          let _ = maj_noeud_l (get_ref_noeud [-2] listeDejaVus_ref) ge listeDejaVus_ref in()
+          let _ = maj_noeud_r (get_ref_noeud [-2] listeDejaVus_ref) ge listeDejaVus_ref in()
         else  let new_node_l = {id = [-2] ;depth = d} in let new_node_r = {id = [-2] ;depth = d} in
           let new_element = {entier = ge; node_l = ref new_node_l;node_r = ref new_node_r} in
           let _ = listeDejaVus_ref := new_element :: !listeDejaVus_ref in ()
       | Node (d,Leaf(false),Leaf(true)) ->
         if check_ldv ge !listeDejaVus_ref then
           let _ = maj_noeud_l (get_ref_noeud [-2] listeDejaVus_ref) ge listeDejaVus_ref in
-          let _ = maj_noeud_l (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in ()
+          let _ = maj_noeud_r (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in ()
         else  let new_node_l = {id = [-2] ;depth = d} in let new_node_r = {id = [-1] ;depth = d} in
           let new_element = {entier = ge; node_l = ref new_node_l;node_r = ref new_node_r} in
           let _ = listeDejaVus_ref := new_element :: !listeDejaVus_ref in ()
       | Node (d,Leaf(true),Leaf(true)) ->
         if check_ldv ge !listeDejaVus_ref then
           let _ = maj_noeud_l (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in
-          let _ = maj_noeud_l (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in ()
+          let _ = maj_noeud_r (get_ref_noeud [-1] listeDejaVus_ref) ge listeDejaVus_ref in ()
         else  let new_node_l = {id = [-1] ;depth = d} in let new_node_r = {id = [-1] ;depth = d} in
           let new_element = {entier = ge; node_l = ref new_node_l;node_r = ref new_node_r} in
           let _ = listeDejaVus_ref := new_element :: !listeDejaVus_ref in ()

@@ -282,14 +282,16 @@ let rec sup_prefix0 l =
  let ex_sup_prefix0 = sup_prefix0 [0;0;1;0;2;0] (*[1; 0; 2; 0]*)
  (** test correct!! **)
  
-let liste_feuille_to_ge lf =
+ let liste_feuille_to_ge lf =
   let rec aux lf acc =  
     let list_length = List.length lf in   
     match list_length <= 64 with
     | true -> List.rev ( sup_prefix0 ((composition lf) ::acc )) 
     | false -> aux (List.rev (completion ((List.rev lf),(list_length - 64)))) ((composition (completion (lf,64))) ::acc)
-    (*** explication:  si length > 64, acc @ les premiers 64 ensuite on la reste sauf que les premiers 64 va continuer la récursive ***)
-  in aux lf []
+   (*** explication:  si length > 64, acc @ les premiers 64 ensuite on la reste sauf que les premiers 64 va continuer la récursive ***)
+    in let ret = aux lf [] in
+  if ret = [] then [0]
+  else ret
 (** test liste_feuille_to_ge  est juste derrière que le test de ge_to_liste_feuille **)
 
 (** 2. ge_to_liste_feuille **)
