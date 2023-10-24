@@ -2,6 +2,10 @@
 (**********************Question 1.1*********************)
 type grand_entier = int list
 
+
+
+
+
 (**********************Question 1.2 ********************)
 let decomposition num =
   if num = 0 then [false]
@@ -406,6 +410,8 @@ let ex_lf_to_ge5 = liste_feuille_to_ge (ge_to_liste_feuille [5;4;3;2;1]) (* - : 
  (** test correct **)
 
 (** 3. check si n est la première composante d’un couple stocké dans ListeDejaVus **)
+let ex_25899 = decomposition 25899
+let dbt_25899 = cons_arbre ex_25899
 
 let rec check_ldv n ldv =
   match ldv with
@@ -446,6 +452,45 @@ let dbt_to_liste_deja_vus dbt =
     let _ = listeDejaVus_ref := element :: !listeDejaVus_ref in
     let _ = aux l in aux r
     in let _ = aux dbt in !listeDejaVus_ref
+
+(* test *)
+let test_dbt_to_liste_deja_vus =  dbt_to_liste_deja_vus dbt_25899
+(* [{entier = GE [1]; node_l = {contents = {id = BL true}};
+node_r = {contents = {id = BL false}}; depth = 4};
+{entier = GE [2]; node_l = {contents = {id = BL false}};
+node_r = {contents = {id = BL true}}; depth = 4};
+{entier = GE [6]; node_l = {contents = {id = GE [2]}};
+node_r = {contents = {id = GE [1]}}; depth = 3};
+{entier = GE [1]; node_l = {contents = {id = BL true}};
+node_r = {contents = {id = BL false}}; depth = 4};
+{entier = GE [1]; node_l = {contents = {id = BL true}};
+node_r = {contents = {id = BL false}}; depth = 4};
+{entier = GE [5]; node_l = {contents = {id = GE [1]}};
+node_r = {contents = {id = GE [1]}}; depth = 3};
+{entier = GE [101]; node_l = {contents = {id = GE [5]}};
+node_r = {contents = {id = GE [6]}}; depth = 2};
+{entier = GE [0]; node_l = {contents = {id = BL false}};
+node_r = {contents = {id = BL false}}; depth = 4};
+{entier = GE [2]; node_l = {contents = {id = BL false}};
+node_r = {contents = {id = BL true}}; depth = 4};
+{entier = GE [2]; node_l = {contents = {id = GE [2]}};
+node_r = {contents = {id = GE [0]}}; depth = 3};
+{entier = GE [2]; node_l = {contents = {id = BL false}};
+node_r = {contents = {id = BL true}}; depth = 4};
+{entier = GE [3]; node_l = {contents = {id = BL true}};
+node_r = {contents = {id = BL true}}; depth = 4};
+{entier = GE [11]; node_l = {contents = {id = GE [3]}};
+node_r = {contents = {id = GE [2]}}; depth = 3};
+{entier = GE [43]; node_l = {contents = {id = GE [11]}};
+node_r = {contents = {id = GE [2]}}; depth = 2};
+{entier = GE [25899]; node_l = {contents = {id = GE [43]}};
+node_r = {contents = {id = GE [101]}}; depth = 1};
+{entier = BL true; node_l = {contents = {id = BL true}};
+node_r = {contents = {id = BL true}}; depth = -1};
+{entier = BL false; node_l = {contents = {id = BL false}};
+node_r = {contents = {id = BL false}}; depth = -1}] *)
+(* test correct! *)
+
 
 let z_sup ldv_ref e_sup replace=
   let rec aux ldv acc =
@@ -526,13 +571,7 @@ let compressionParListe arbre_decision =
   !ldv_ref
 
 (** test **)
-let ex_25899 = decomposition 25899
-let dbt_25899 = cons_arbre ex_25899
 let test_compression_par_liste_25899 =  compressionParListe dbt_25899 
-
-
-
-
 
 
 (**********************Question 3.12 ********************)
@@ -610,7 +649,6 @@ let dot fichier arbre_de_decision =
 let test_graphe = dot file_graphe dbt_25899
      
 
-
 (**********************Question 3.13 ********************)
 (* On a déjà fait cette question quand on teste la question 2.8 *)
 let ex_25899 = decomposition 25899
@@ -627,24 +665,116 @@ Node (1,
 
   (** C'est exactement la même arbre que la figure 1 dans l'annoncé**)
 
-
 (**********************Question 3.14 ********************)
 
-(******  TODO: comprendre Q3.11 et Q3.12 ici c'est juste vérifier  *****)
+(* https://graphs.grevian.org/graph/4854942932140032*)
 
 
 
 (**********************Question 4.15 ********************)
-type node = { id: int; (* Autres informations liées au nœud *) }
 
 type arbre_deja_vus =
-  | Noeud of node * arbre_deja_vus * arbre_deja_vus
+  | Noeud of elements * arbre_deja_vus * arbre_deja_vus
   | Feuille
 
+(**********************Question 4.16 ********************)
+
+let dbt_to_arbre_deja_vus dbt =
+  let rec aux dbt = 
+  let ge = liste_feuille_to_ge (liste_feuilles dbt) in
+    match dbt with
+  | Leaf (b) -> failwith "Wont reach here!"
+  | Node (d,Leaf(a),Leaf(b)) -> 
+    let new_node_l = {id = BL(a)} in
+    let new_node_r = {id = BL(b)} in
+    let element = {entier = GE(ge); node_l = ref new_node_l; node_r = ref new_node_r; depth = d} in
+    Noeud (element,Feuille,Feuille)
+  | Node (d,l,r) -> 
+    let new_node_l = {id = GE(liste_feuille_to_ge (liste_feuilles l))} in
+    let new_node_r = {id = GE(liste_feuille_to_ge (liste_feuilles r))} in
+    let element = {entier = GE(ge); node_l = ref new_node_l; node_r = ref new_node_r; depth = d} in
+    Noeud(element, aux l , aux r)
+  in aux dbt
+
+let test_25899_adv = dbt_to_arbre_deja_vus dbt_25899
+
+(* Noeud
+({entier = GE [25899]; node_l = {contents = {id = GE [43]}};
+  node_r = {contents = {id = GE [101]}}; depth = 1},
+Noeud
+ ({entier = GE [43]; node_l = {contents = {id = GE [11]}};
+   node_r = {contents = {id = GE [2]}}; depth = 2},
+ Noeud
+  ({entier = GE [11]; node_l = {contents = {id = GE [3]}};
+    node_r = {contents = {id = GE [2]}}; depth = 3},
+  Noeud
+   ({entier = GE [3]; node_l = {contents = {id = BL true}};
+     node_r = {contents = {id = BL true}}; depth = 4},
+   Feuille, Feuille),
+  Noeud
+   ({entier = GE [2]; node_l = {contents = {id = BL false}};
+     node_r = {contents = {id = BL true}}; depth = 4},
+   Feuille, Feuille)),
+ Noeud
+  ({entier = GE [2]; node_l = {contents = {id = GE [2]}};
+    node_r = {contents = {id = GE [0]}}; depth = 3},
+  Noeud
+   ({entier = GE [2]; node_l = {contents = {id = BL false}};
+     node_r = {contents = {id = BL true}}; depth = 4},
+   Feuille, Feuille),
+  Noeud
+   ({entier = GE [0]; node_l = {contents = {id = BL false}};
+     node_r = {contents = {id = BL false}}; depth = 4},
+   Feuille, Feuille))),
+Noeud
+ ({entier = GE [101]; node_l = {contents = {id = GE [5]}};
+   node_r = {contents = {id = GE [6]}}; depth = 2},
+ Noeud
+  ({entier = GE [5]; node_l = {contents = {id = GE [1]}};
+    node_r = {contents = {id = GE [1]}}; depth = 3},
+  Noeud
+   ({entier = GE [1]; node_l = {contents = {id = BL true}};
+     node_r = {contents = {id = BL false}}; depth = 4},
+   Feuille, Feuille),
+  Noeud
+   ({entier = GE [1]; node_l = {contents = {id = BL true}};
+     node_r = {contents = {id = BL false}}; depth = 4},
+   Feuille, Feuille)),
+ Noeud
+  ({entier = GE [6]; node_l = {contents = {id = GE [2]}};
+    node_r = {contents = {id = GE [1]}}; depth = 3},
+  Noeud
+   ({entier = GE [2]; node_l = {contents = {id = BL false}};
+     node_r = {contents = {id = BL true}}; depth = 4},
+   Feuille, Feuille),
+  Noeud
+   ({entier = GE [1]; node_l = {contents = {id = BL true}};
+     node_r = {contents = {id = BL false}}; depth = 4},
+   Feuille, Feuille)))) *)
 
 
+  (** 15 noeuds sans BL **)
+  (* test correct! *)
+
+(**********************Question 4.17 ********************)
+
+(* let z_sup_ab adv_ref e_sup replace=
+  let rec aux adv  =
+   match adv with
+  | Feuille  -> Feuille
+  | Noeud ({entier = e; node_l = l; node_r = r; depth = d} as n,ab_l,ab_r) -> 
+  if e = e_sup  || e = GE([0]) then Feuille
+  else if !l.id = e_sup then Noeud ({entier = e;node_l = replace;node_r = r;depth=d}, aux ab_l, aux ab_r)
+  else if !r.id = e_sup || !r.id = GE([0]) then Noeud ({entier = e;node_l = l;node_r = replace;depth=d}, aux ab_l, aux ab_r)
+  else Noeud(n,aux ab_l,ab_r)
+  in let ret = aux !adv_ref   in adv_ref := ret
 
 
-
-
+let rec maj_regle_Z_ab adv_ref =
+  match !adv_ref with
+  | Feuille -> ()
+  | Noeud ({entier = e; node_l = l; node_r = r; depth = d} ,ab_l,ab_r) -> 
+    if !r.id = BL(false) then
+    let _ = z_sup_ab adv_ref e l in maj_regle_Z_ab (ref ab_l)
+    else maj_regle_Z_ab (ref ab_r) *)
 
