@@ -15,8 +15,4 @@ graph {
 43 -- 2
 25899 -- 43 [style=dotted]
 25899 -- 101
-true -- true [style=dotted]
-true -- true
-false -- false [style=dotted]
-false -- false
 }

@@ -570,14 +570,17 @@ let node_id_to_string node_id =
 let test_il_to_s = ge_to_int (GE[3;4;2;1]) (*3 correct*)
 
 (** l'implémentation de sémantique de dot **)
-(* let cons_graphe_dot arbre_de_decision = "TEST\n" *)
 let cons_graphe_dot_string_liste arbre_de_decision = 
   let elements_liste = compressionParListe arbre_de_decision  in
   let graphe_string_liste = ref [] in
   let rec aux el =
     match el with
     | [] -> !graphe_string_liste
-    | hd :: tl -> let _ = graphe_string_liste := 
+    | hd :: tl -> 
+    if hd.entier = BL(true) || hd.entier = BL(false) then aux tl
+    else
+    let _ = graphe_string_liste :=  (** On peut faire exactement la même chose que figure 2,
+         juste remplacer le grand entier par le depth, mais je préfère ge parce que c'est distinct **)
     ((node_id_to_string hd.entier) ^ " -- " ^ node_id_to_string (!(hd.node_l).id) ^ " [style=dotted]") :: 
     ((node_id_to_string hd.entier) ^ " -- " ^ node_id_to_string (!(hd.node_r).id)) :: 
     !graphe_string_liste 
@@ -606,8 +609,6 @@ let dot fichier arbre_de_decision =
     
 let test_graphe = dot file_graphe dbt_25899
      
-
-
 
 
 (**********************Question 3.13 ********************)

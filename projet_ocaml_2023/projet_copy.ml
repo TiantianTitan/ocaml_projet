@@ -434,7 +434,6 @@ let f = maj_regle_Z a
 let b = !a
 
 
-
 let maj_regle_M ldv_ref =
   let reste = ref [] in
   let supp = ref [] in
