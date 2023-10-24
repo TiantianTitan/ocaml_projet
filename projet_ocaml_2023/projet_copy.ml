@@ -13,12 +13,6 @@ let decomposition num =
       else aux (num/2) (false :: acc)
     in List.rev (aux num [])
 
-let rec pow_rec a n = 
-    if n = 0 then 1
-    else a* (pow_rec a (n-1))
-let _2pow36 = pow_rec 2 36
-let ex_2_36 = decomposition _2pow36
-   
 (**    test   **)
 let ex_dec = decomposition(38) (*[false; true; true; false; false; true]*)
 (**    test correct! ! **)
@@ -38,21 +32,7 @@ let completion couple =
   let com_2 =  completion([false; true; true; false; false; true], 8)  (*[false; true; true; false; false; true; false; false]*)
   (*  test correct! *)
 
-
-  (*** Question 1.2 version int list -> bool list ***)
-  let decomposition_liste int_list =
-    let rec aux l acc =
-      match l with 
-      |[]->acc
-      |x::[]-> acc @ (decomposition x)
-      |hd :: tl -> aux tl (acc @ (completion (decomposition hd, 64)))
-    in aux int_list []
-
-
-
-
 (**********************Question 1.4 ********************)
-
 let composition lb = 
   let rec aux lb acc =
     match lb with
@@ -67,40 +47,6 @@ let ex_com1 = composition listbool (* - : int = 6 *)
 let ex_com2 = composition [true;true] (*- : int = 3 *)
 (*  test correct! *)
 
-
-
-(****************  version composition_liste bool list -> int list  ***********************)
-let rec sup_prefixe l n =
-  match l,n with
-  |[], n -> []
-  |_, 0 -> l
-  |hd::tl, n -> if n > 0 then sup_prefixe tl (n-1) 
-          else l
-
-let composition_liste lb = 
-  let rec aux lb acc =
-    match lb with
-    | [] -> List.rev acc
-    | hd :: tl -> aux (sup_prefixe lb 64) (composition lb ::acc)
-  in aux lb []
-
-(***test**)
-let listbool = [false;true;true]
-let ex_com1 = composition listbool (* - : int = 6 *)
-let ex_com2 = composition [true;true] (*- : int = 3 *)
-(*  test correct! *)
- let lb3= [false; true; true; false; false; true; false; false; false; false; false;
- false; false; false; false; false; false; false; false; false; false;
- false; false; false; false; false; false; false; false; false; false;
- false; false; false; false; false; false; false; false; false; false;
- false; false; false; false; false; false; false; false; false; false;
- false; false; false; false; false; false; false; false; false; false;
- false; false; false; false; true]
-
- let ln=sup_prefixe lb3 64 (*[false;true]*)
- let ex_com3 = composition_liste lb3 (*- : int = [38;2]*)
-
- (****test correct!****)
 
   
 (**********************Question 1.5 ********************)
