@@ -627,7 +627,7 @@ let test_cons_graphe_dot_string_liste = cons_graphe_dot_string_liste dbt_25899
 
 
 (** Le principale de construction d'un ficher dot **)    
-let file_graphe = "./graphe.dot"
+let file_graphe = "./graphe_par_list.dot"
 let dot fichier arbre_de_decision = 
   let _ = () in   
   let head = "graph {" in
@@ -664,6 +664,7 @@ Node (1,
 
 (**********************Question 3.14 ********************)
 
+(* GraphViz Pocket Reference compressionParListe *)
 (* https://graphs.grevian.org/graph/4854942932140032 *)
 
 
@@ -775,7 +776,6 @@ Noeud
   (** 15 noeuds sans BL **)
   (* test correct! *)
 
-
 let rec is_in_tree ge tree =
   match tree with
   | Feuille -> false
@@ -789,7 +789,6 @@ let ex_tree = Noeud({entier = GE([1]); node_l = ref {id = BL(true)}  ; node_r = 
 let ex_test1 = is_in_tree (GE[1]) ex_tree (*true*)
 let ex_test2 = is_in_tree (GE[2]) ex_tree (*false*)
 (* test correct! *)
-
 
 let inserer_node_in_tree node tree =
   match node.entier with
@@ -836,9 +835,6 @@ let maj_node_in_tree_l node tree node_l =
   let ex_maj_l = maj_node_in_tree_l {entier = GE([1]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1} ex_test4  (ref {id = GE[2]})
   (* test correct! *)
 
-
-
-
   let maj_node_in_tree_r node tree node_r =
     match node.entier with
     | BL(b) -> tree
@@ -882,11 +878,53 @@ let regle_M adv =
       else let _ = ret_ref := Noeud(elt,Feuille,!ret_ref) in let _ = aux l (left) in aux r (not left)
   in aux adv left
    
+(* test M*)  
 let test_M = regle_M test_25899_adv
-
 let test_M_ref = ref (regle_M test_25899_adv)   
-
 let test_M = !test_M_ref 
+(* 
+val test_M : arbre_deja_vus =
+  Noeud
+   ({entier = GE [6]; node_l = {contents = {id = GE [2]}};
+     node_r = {contents = {id = GE [1]}}; depth = 3},
+   Noeud
+    ({entier = GE [1]; node_l = {contents = {id = BL true}};
+      node_r = {contents = {id = BL false}}; depth = 4},
+    Feuille,
+    Noeud
+     ({entier = GE [5]; node_l = {contents = {id = GE [1]}};
+       node_r = {contents = {id = GE [1]}}; depth = 3},
+     Feuille,
+     Noeud
+      ({entier = GE [101]; node_l = {contents = {id = GE [5]}};
+        node_r = {contents = {id = GE [6]}}; depth = 2},
+      Feuille,
+      Noeud
+       ({entier = GE [0]; node_l = {contents = {id = BL false}};
+         node_r = {contents = {id = BL false}}; depth = 4},
+       Noeud
+        ({entier = GE [2]; node_l = {contents = {id = BL false}};
+          node_r = {contents = {id = BL true}}; depth = 4},
+        Feuille,
+        Noeud
+         ({entier = GE [3]; node_l = {contents = {id = BL true}};
+           node_r = {contents = {id = BL true}}; depth = 4},
+         Noeud
+          ({entier = GE [11]; node_l = {contents = {id = GE [3]}};
+            node_r = {contents = {id = GE [2]}}; depth = 3},
+          Noeud
+           ({entier = GE [43]; node_l = {contents = {id = GE [11]}};
+             node_r = {contents = {id = GE [2]}}; depth = 2},
+           Noeud
+            ({entier = GE [25899]; node_l = {contents = {id = GE [43]}};
+              node_r = {contents = {id = GE [101]}}; depth = 1},
+            Feuille, Feuille),
+           Feuille),
+          Feuille),
+         Feuille)),
+       Feuille)))),
+   Feuille)
+   *)
 
 
 let to_list adv =
@@ -926,18 +964,56 @@ let f = maj_regle_Z d
 let e = !d
 
 
-let compress_par_arbre arbre_decision =
+let compressionParArbre arbre_decision =
   let adv_ref = ref (dbt_to_arbre_deja_vus arbre_decision) in
   let list_ref = ref (to_list !adv_ref) in
   let _  = maj_regle_Z list_ref in let _ = ge1_to_bltrue list_ref in  let  _ =  adv_ref := to_adv (!list_ref) in let ret = regle_M !adv_ref in
   ret
 
   
-let finish = compress_par_arbre dbt_25899
+let finish = compressionParArbre dbt_25899
 
 
 
 
+let cons_graphe_dot_string_arbre arbre_de_decision = 
+  let elements_arbre = compressionParArbre arbre_de_decision  in
+  let graphe_string_liste = ref [] in
+  let rec aux el =
+    match el with
+    | Feuille -> !graphe_string_liste
+    | Noeud(elt,l,r) -> 
+    if elt.entier = BL(true) || elt.entier = BL(false) then let _ = aux l in aux r
+    else
+    let _ = graphe_string_liste :=  (** On peut faire exactement la même chose que figure 2,
+         juste remplacer le grand entier par le depth, mais je préfère ge parce que c'est distinct **)
+    ((node_id_to_string elt.entier) ^ " -- " ^ node_id_to_string (!(elt.node_l).id) ^ " [style=dotted]") :: 
+    ((node_id_to_string elt.entier) ^ " -- " ^ node_id_to_string (!(elt.node_r).id)) :: 
+    !graphe_string_liste 
+    in let _ = aux l in aux r
+  in aux elements_arbre
+
+let test_cons_graphe_dot_string_arbre = cons_graphe_dot_string_arbre dbt_25899
 
 
+(** Le principale de construction d'un ficher dot **)    
+let file_graphe = "./graphe_par_arbre.dot"
+let dot fichier arbre_de_decision = 
+  let _ = () in   
+  let head = "graph {" in
+  let tail = "}" in
+  let s_list = cons_graphe_dot_string_arbre arbre_de_decision in
+    let oc = open_out file_graphe in
+    let _ = Printf.fprintf oc "%s\n" head in (*graph {*)
+    let rec aux s_list =
+      match s_list with
+      | [] -> ()
+      | hd :: tl -> let _ = Printf.fprintf oc "%s\n" hd in aux tl
+    in let _ = aux s_list in
+    let _ = Printf.fprintf oc "%s" tail in (*}*)
+    close_out oc
+    
+let test_graphe = dot file_graphe dbt_25899
 
+(* GraphViz Pocket Reference compressionParArbre*)
+(* https://graphs.grevian.org/graph/6211502614773760 *)
