@@ -3,9 +3,6 @@
 type grand_entier = int list
 
 
-
-
-
 (**********************Question 1.2 ********************)
 let decomposition num =
   if num = 0 then [false]
@@ -667,7 +664,7 @@ Node (1,
 
 (**********************Question 3.14 ********************)
 
-(* https://graphs.grevian.org/graph/4854942932140032*)
+(* https://graphs.grevian.org/graph/4854942932140032 *)
 
 
 
@@ -678,6 +675,28 @@ type arbre_deja_vus =
   | Feuille
 
 (**********************Question 4.16 ********************)
+(* 
+if once_false then
+let new_node_l = {id = BL(a)} in
+let new_node_r = {id = BL(b)} in
+let element = {entier = GE(ge); node_l = ref new_node_l; node_r = ref new_node_r; depth = d} in
+  Noeud (element,Feuille,Feuille)
+| else
+  let element_false = {entier = BL(false); node_l = ref {id = BL(false)}; node_r = ref {id= BL(false)}; depth = -1} in
+  Noeud (element,element_false,Feuille) *)
+
+  let  add_true_false adv =
+    let f_ref = ref false in
+    let rec aux adv =
+    match adv with
+    | Feuille -> 
+      if not !f_ref then 
+      let _ = f_ref := true in
+      Noeud({entier = BL(false); node_l = ref {id = BL(false)}; node_r = ref {id = BL(false)}; depth = -1},Noeud({entier = BL(true); node_l = ref {id = BL(true)}; node_r = ref {id = BL(true)}; depth = -1},Feuille,Feuille),Feuille)
+      else Feuille
+    | Noeud(elt,l,r) -> Noeud(elt,aux l, aux r)
+    in aux adv
+
 
 let dbt_to_arbre_deja_vus dbt =
   let rec aux dbt = 
@@ -688,15 +707,16 @@ let dbt_to_arbre_deja_vus dbt =
     let new_node_l = {id = BL(a)} in
     let new_node_r = {id = BL(b)} in
     let element = {entier = GE(ge); node_l = ref new_node_l; node_r = ref new_node_r; depth = d} in
-    Noeud (element,Feuille,Feuille)
+      Noeud (element,Feuille,Feuille)
   | Node (d,l,r) -> 
     let new_node_l = {id = GE(liste_feuille_to_ge (liste_feuilles l))} in
     let new_node_r = {id = GE(liste_feuille_to_ge (liste_feuilles r))} in
     let element = {entier = GE(ge); node_l = ref new_node_l; node_r = ref new_node_r; depth = d} in
     Noeud(element, aux l , aux r)
-  in aux dbt
+  in let new_dbt = aux dbt in (*add_true_false new_dbt*) new_dbt
 
-let test_25899_adv = dbt_to_arbre_deja_vus dbt_25899
+
+let test_25899_adv = dbt_to_arbre_deja_vus dbt_25899 
 
 (* Noeud
 ({entier = GE [25899]; node_l = {contents = {id = GE [43]}};
@@ -752,29 +772,172 @@ Noeud
      node_r = {contents = {id = BL false}}; depth = 4},
    Feuille, Feuille)))) *)
 
-
   (** 15 noeuds sans BL **)
   (* test correct! *)
 
+
+let rec is_in_tree ge tree =
+  match tree with
+  | Feuille -> false
+  | Noeud(elt,l,r) -> 
+    if elt.entier = ge then true
+    else is_in_tree ge l || is_in_tree ge r
+
+
+(* test *)
+let ex_tree = Noeud({entier = GE([1]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1},Feuille,Feuille)
+let ex_test1 = is_in_tree (GE[1]) ex_tree (*true*)
+let ex_test2 = is_in_tree (GE[2]) ex_tree (*false*)
+(* test correct! *)
+
+
+let inserer_node_in_tree node tree =
+  match node.entier with
+  | BL(b) -> tree
+  | GE(ge) ->
+    if is_in_tree node.entier tree then tree
+    else 
+    let feuille_liste = ge_to_liste_feuille ge in
+    let rec aux tree bl=
+    match tree with
+    | Feuille -> Noeud(node,Feuille,Feuille)
+    | Noeud(elt,l,r) -> match bl with
+                        | [] -> Noeud(node,Feuille,Feuille)
+                        | hd :: tl -> if hd = false then Noeud(elt, aux l tl,r)
+                                      else Noeud(elt,l, aux r tl)
+    in aux tree feuille_liste
+
+(* test *)
+let ex_test3 = inserer_node_in_tree {entier = GE([1]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1} ex_tree
+let ex_test4 = inserer_node_in_tree {entier = GE([2]); node_l = ref {id = BL(false)}  ; node_r =  ref {id = BL(true)}; depth = 1} ex_tree
+(* Noeud
+({entier = GE [1]; node_l = {contents = {id = BL true}};
+  node_r = {contents = {id = BL false}}; depth = 1},
+Noeud
+ ({entier = GE [2]; node_l = {contents = {id = BL false}};
+   node_r = {contents = {id = BL true}}; depth = 1},
+ Feuille, Feuille),
+Feuille) *)
+
+(* test correct! *)
+
+let maj_node_in_tree_l node tree node_l =
+  match node.entier with
+  | BL(b) -> tree
+  | GE(ge) ->
+    let rec aux tree =
+    match tree with
+    | Feuille -> Feuille
+    | Noeud(elt,l,r) -> if node.entier = elt.entier then  Noeud({entier = node.entier; node_l = node_l; node_r = elt.node_r; depth = elt.depth},aux l, aux r)
+    else Noeud(elt,aux l, aux r)
+    in aux tree 
+
+  (* test *)
+  let ex_maj_l = maj_node_in_tree_l {entier = GE([1]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1} ex_test4  (ref {id = GE[2]})
+  (* test correct! *)
+
+
+
+
+  let maj_node_in_tree_r node tree node_r =
+    match node.entier with
+    | BL(b) -> tree
+    | GE(ge) ->
+      let rec aux tree =
+      match tree with
+      | Feuille -> Feuille
+      | Noeud(elt,l,r) -> if node.entier = elt.entier then  Noeud({entier = node.entier; node_l = elt.node_l; node_r = node_r; depth = elt.depth},aux l, aux r)
+      else Noeud(elt,aux l, aux r)
+      in aux tree 
+
+(* test *)
+let ex_maj_r = maj_node_in_tree_r {entier = GE([1]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1} ex_test4  (ref {id = GE[2]})
+(* test correct! *)
+
+(* let rec maj_l_elt_in_tree ge tree l  *)
+
+
 (**********************Question 4.17 ********************)
 
-(* let z_sup_ab adv_ref e_sup replace=
-  let rec aux adv  =
-   match adv with
-  | Feuille  -> Feuille
-  | Noeud ({entier = e; node_l = l; node_r = r; depth = d} as n,ab_l,ab_r) -> 
-  if e = e_sup  || e = GE([0]) then Feuille
-  else if !l.id = e_sup then Noeud ({entier = e;node_l = replace;node_r = r;depth=d}, aux ab_l, aux ab_r)
-  else if !r.id = e_sup || !r.id = GE([0]) then Noeud ({entier = e;node_l = l;node_r = replace;depth=d}, aux ab_l, aux ab_r)
-  else Noeud(n,aux ab_l,ab_r)
-  in let ret = aux !adv_ref   in adv_ref := ret
+let get_noeud_par_chemin adv blist =
+  let rec aux adv blist = 
+   match adv , blist with
+   | Feuille, _ -> Feuille
+   | noeud , [] -> noeud
+   | Noeud(elt,l,r) , hd ::tl -> if hd = false then aux l tl
+   else aux r tl
+   in aux adv blist
 
 
-let rec maj_regle_Z_ab adv_ref =
-  match !adv_ref with
-  | Feuille -> ()
-  | Noeud ({entier = e; node_l = l; node_r = r; depth = d} ,ab_l,ab_r) -> 
-    if !r.id = BL(false) then
-    let _ = z_sup_ab adv_ref e l in maj_regle_Z_ab (ref ab_l)
-    else maj_regle_Z_ab (ref ab_r) *)
+
+let regle_M adv =
+  let ret_ref = ref Feuille in 
+  let left = true in
+  let rec aux courant left=
+    match courant with
+    | Feuille -> !ret_ref
+    | Noeud(elt,l,r) -> 
+      if is_in_tree elt.entier !ret_ref then let _ = aux l left in aux r (not left)
+      else if left then let _ = ret_ref := Noeud(elt,!ret_ref,Feuille) in let _ = aux l (left) in aux r (not left)
+      else let _ = ret_ref := Noeud(elt,Feuille,!ret_ref) in let _ = aux l (left) in aux r (not left)
+  in aux adv left
+   
+let test_M = regle_M test_25899_adv
+
+let test_M_ref = ref (regle_M test_25899_adv)   
+
+let test_M = !test_M_ref 
+
+
+let to_list adv =
+  let rec aux adv acc =
+  match adv with
+  | Feuille ->  acc
+  | Noeud(elt,l,r) -> aux r (aux l  (elt :: acc))
+  in aux adv []
+
+  let a = to_list test_M
+  let origin = to_list test_25899_adv
+
+let supp_in_list l ge =
+  let rec aux l acc =
+    match l with
+  | [] -> acc
+  | hd ::tl -> if hd.entier = ge then aux tl acc
+  else aux tl (hd :: acc)
+  in aux l []
+
+let to_adv list =
+  let rec aux list acc boolean=
+    match list with
+    | [] -> acc
+    | hd :: tl ->
+    if not boolean then aux tl (Noeud(hd,acc,Feuille)) true
+    else aux tl (Noeud(hd,Feuille,acc)) false
+    in aux list Feuille false
+
+let b =  to_adv a
+let test_supp_in_list = supp_in_list a (GE[0]) 
+
+let c = to_adv test_supp_in_list
+
+let d = ref origin
+let f = maj_regle_Z d
+let e = !d
+
+
+let compress_par_arbre arbre_decision =
+  let adv_ref = ref (dbt_to_arbre_deja_vus arbre_decision) in
+  let list_ref = ref (to_list !adv_ref) in
+  let _  = maj_regle_Z list_ref in let _ = ge1_to_bltrue list_ref in  let  _ =  adv_ref := to_adv (!list_ref) in let ret = regle_M !adv_ref in
+  ret
+
+  
+let finish = compress_par_arbre dbt_25899
+
+
+
+
+
+
 
