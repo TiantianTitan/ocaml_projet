@@ -1,22 +1,27 @@
+
 (**********************Question 1.1*********************)
-type grand_entier = int64 list
+type grand_entier = int list
 
 
 (**********************Question 1.2 ********************)
 let decomposition num =
-  if num = 0L then [false]
+  if num = 0 then [false]
   else
   let rec aux num acc =
-    if num <= 0L then acc
-    else let modulo = Int64.rem num 2L in 
-      if modulo = 1L then aux (Int64.div num 2L) (true :: acc)
-      else aux (Int64.div num 2L) (false :: acc)
+    if num <= 0 then acc
+    else let modulo = num mod 2 in 
+      if modulo = 1 then aux (num/2) (true :: acc)
+      else aux (num/2) (false :: acc)
     in List.rev (aux num [])
 
-let int_100 = decomposition 38L
+let rec pow_rec a n = 
+    if n = 0 then 1
+    else a* (pow_rec a (n-1))
+let _2pow36 = pow_rec 2 36
+let ex_2_36 = decomposition _2pow36
    
 (**    test   **)
-let ex_dec = decomposition(38L) (*[false; true; true; false; false; true]*)
+let ex_dec = decomposition(38) (*[false; true; true; false; false; true]*)
 (**    test correct! ! **)
 
 (**********************Question 1.3 ********************)
@@ -35,7 +40,7 @@ let completion couple =
   (*  test correct! *)
 
 
-  (*** Question 1.2 version int64 list -> bool list ***)
+  (*** Question 1.2 version int list -> bool list ***)
   let decomposition_liste int_list =
     let rec aux l acc =
       match l with 
@@ -43,8 +48,6 @@ let completion couple =
       |x::[]-> acc @ (decomposition x)
       |hd :: tl -> aux tl (acc @ (completion (decomposition hd, 64)))
     in aux int_list []
-
-    let l_int64 = decomposition_liste [4L; 6L]
 
 
 
@@ -55,14 +58,14 @@ let composition lb =
   let rec aux lb acc =
     match lb with
     | [] -> acc
-    | hd :: tl -> if hd = true then aux tl (Int64.add (Int64.mul acc 2L) 1L)
-                  else aux tl (Int64.mul acc 2L)
-  in aux (List.rev lb) 0L
+    | hd :: tl -> if hd = true then aux tl (acc*2+1)
+                  else aux tl (acc*2)
+  in aux (List.rev lb) 0
 
 (***test**)
 let listbool = [false;true;true]
-let ex_com1 = composition listbool (* - : int = 6L *)
-let ex_com2 = composition [true;true] (*- : int = 3L *)
+let ex_com1 = composition listbool (* - : int = 6 *)
+let ex_com2 = composition [true;true] (*- : int = 3 *)
 (*  test correct! *)
 
 
@@ -84,8 +87,8 @@ let composition_liste lb =
 
 (***test**)
 let listbool = [false;true;true]
-let ex_com1 = composition listbool (* - : int = 6L *)
-let ex_com2 = composition [true;true] (*- : int = 3L *)
+let ex_com1 = composition listbool (* - : int = 6 *)
+let ex_com2 = composition [true;true] (*- : int = 3 *)
 (*  test correct! *)
  let lb3= [false; true; true; false; false; true; false; false; false; false; false;
  false; false; false; false; false; false; false; false; false; false;
@@ -96,7 +99,7 @@ let ex_com2 = composition [true;true] (*- : int = 3L *)
  false; false; false; false; true]
 
  let ln=sup_prefixe lb3 64 (*[false;true]*)
- let ex_com3 = composition_liste lb3 (*- : int = [38L;2L]*)
+ let ex_com3 = composition_liste lb3 (*- : int = [38;2]*)
 
  (****test correct!****)
 
@@ -105,72 +108,70 @@ let ex_com2 = composition [true;true] (*- : int = 3L *)
 
 let table x n = completion ((decomposition x),n)
 (*test*)
-let tab1 = table 15L 3  (*true; true; true]*)
-let tab2 = table 12L 4  (*[false; false; true; true]*)
-let tab3 = table 5L 8   (*[true; false; true; false; false; false; false; false]*)
+let tab1 = table 15 3  (*true; true; true]*)
+let tab2 = table 12 4  (*[false; false; true; true]*)
+let tab3 = table 5 8   (*[true; false; true; false; false; false; false; false]*)
 
 (**********************Question 1.6 ********************)
 
 (*récursive*)
 let rec pow_rec a n = 
-  if n = 0 then 1L
-  else Int64.mul a (pow_rec a (n-1))
+  if n = 0 then 1
+  else a* (pow_rec a (n-1))
 
 (*récursive terminale*)
 let pow_rec_t a n =
   let rec aux n acc=
     match n with
     | 0 -> acc  
-    | _ -> aux (n-1) (Int64.mul acc a)
-    in aux n 1L
+    | _ -> aux (n-1) (a*acc)
+    in aux n 1
 
-
-  let genAlea n = 
-    let rec aux n acc  =
-      if n < 0 then acc
-      else if n < 32 then (completion ((decomposition (Random.int64 (pow_rec 2L n))),n)) @ acc
-      else if n >= 32 && n < 64 then 
-        (completion ((decomposition  (Random.int64 ( (pow_rec 2L 32)))),32)) @ 
-        (completion ((decomposition  (Random.int64  (pow_rec 2L (n-32)))),n-32))
-        @ acc    
-        (** Le code ci-dessus c'est pour résoudre le maximum valeur du type de int **)
-      else aux (n-64) (completion (((decomposition (Random.int64 Int64.max_int)),64)) @ acc)
-    in aux n []
+let genAlea n = 
+  let rec aux n acc  =
+    if n < 0 then acc
+    else if n < 32 then (decomposition (Int64.to_int (Random.int64 (Int64.of_int (pow_rec 2 n))))) :: acc
+    else if n >= 32 && n < 64 then 
+      (decomposition (Int64.to_int (Random.int64 (Int64.of_int (pow_rec 2 32))))) :: 
+      (decomposition (Int64.to_int (Random.int64 (Int64.of_int (pow_rec 2 (n-32)))))) 
+      :: acc    
+      (** Le code ci-dessus c'est pour résoudre le maximum valeur du type de int **)
+    else aux (n-64) ((decomposition  (Int64.to_int (Random.int64 Int64.max_int)))::acc)
+  in aux n []
   
 
-let gen61 = (pow_rec 2L 61)  (*int = 2305843009213693952L*)
-let gen62 = (pow_rec 2L 62)  (*int =  4611686018427387904L*)
-let gen63 = (pow_rec 2L 63)  (*int = -9223372036854775808L*)
+let gen61 = (pow_rec 2 61)  (*int = 2305843009213693952*)
+let gen62 = (pow_rec 2 62)  (*int = -4611686018427387904*)
+let gen63 = (pow_rec 2 63)  (*int = 0*)
 (** test **)
-let ex_0 = genAlea 0   (*[]*)
-let ex_61 = genAlea 61  (*[false; false; false; true; false; false ;...; true]*)
-let ex_62 = genAlea 62  (* [true; false; true; false; false; false; true; false; false; true; false; false;
-                           true; false; false; false; true; true; true; true; false; false; true; false;
-                           true; true; false; true; false; true; true; false; false; true; true; true;
-                           true; false; false; true; false; true; false; true; true; false; false; true;
-                           true; false; false; true; false; false; false; true; false; true; false; false;
-                           false; true] *)
-let ex_63 = genAlea 63  (*[true; false; false; false; false; false; false; false; true; false; true; false;
-                          false; true; false; true; false; false; false; false; true; true; true; false;
-                          true; false; true; false; false; true; false; false; false; true; true; true;
-                          false; false; true; false; true; false; true; false; false; true; false; false;
-                          false; true; true; false; true; false; true; false; false; false; false; true;
-                          false; true; false]*)
-let ex_64 = genAlea 64  (*[true; true; false; true; false; true; false; false; true; true; true; false;
-                          true; false; false; true; true; true; false; true; false; false; false; true;
-                          false; true; true; true; true; false; false; true; true; true; true; true;
-                          false; false; false; true; false; true; false; true; false; false; false; true;
-                          true; false; false; false; false; false; false; true; true; false; true; false;
-                          false; false; true; false]*)
-let ex_100 = genAlea 100  (*[false; false; false; true; false; false;  false; true; false; true; false; false;
-                            true; true; true; false; false; true; true; true; true; true; false; true;
-                            false; true; true; false; true; true; false; true; true; true; true; false;
-                             true; false; false; false; true; true; true; false; true; false; true; false;
-                            false; true; false; false; false; false; false; false; false; true; true; true;
-                            false; false; true; true; false; true; true; true; true; true; true; false;
-                            false; false; false; true; true; false;false; true; true; false; false; true;
-                            false; false; true; false; false; false; true; true; true; false; true; true;
-                            true; false; true; false]*)
+let ex_0 = genAlea 0   (*[[false]]*)
+let ex_61 = genAlea 61  (*[[false; false; false; true; false; false ;...; true]]*)
+let ex_62 = genAlea 62  (* [[true; false; false; true; false; true; false; true; false; false; true;
+                            false; true; true; true; false; false; false; true; false; true; false;
+                            true; true; true; false; false; true; true];
+                            [true; true; false; false; false; false; true; false; true; false; true;
+                            false; false; true; true; false; true; false; true; true; false; true;
+                            false; true; true; true; false; false; false; true]] *)
+let ex_63 = genAlea 63  (*[[true; true; true; true; false; true; true; false; false; false; false;
+                          false; true; true; true; true; false; false; false; false; true; true;
+                          true; true; false; false; false; false; true; true; false; true];
+                          [true; true; false; false; false; false; true; true; false; false; false;
+                          false; false; true; true; true; true; true; false; true; false  ; true; true;
+                          true; true; false; true; true; true]]*)
+let ex_64 = genAlea 64  (*[[false];[true; true; false; true; false; true; true; false; false; false; false; true;
+                          true; false; true; false; false; true; true; false; false; false; false;true; true; false;
+                          true; true; true; false; false; false; false; false;false; true; false; false; true; true; 
+                          false; true; true; false; true; true; false; false; true; false; false; true; true; true; 
+                          true; true; true; true]]*)
+let ex_100 = genAlea 100  (* [ [true; false; false; false; true; true; false; false; false; false; false;
+                              false; true; true; true; true; true; true; true; false; true; false; true;
+                              false; false; true; true; false; false; true; true; false; true];
+                              [true; false; false; true; true; false; true; false; false; true; false; true;
+                              true; true; true; true; false; true; true; false; false; false; false; false;
+                              false; true; true; false; false; false; false; false; false; true; true;
+                              true; true; true; true; true; true; false; true; true; true; false; true;
+                              true; true; false; true; true; true; false; false; false; true; true; true;
+                              true; true]]*)
 (** test correct!**)                              
 
 (**********************Question 2.7 ********************)
@@ -195,7 +196,7 @@ let cons_chemin_list lb =
   let rec aux lb cpt acc =
     match lb with
     | [] -> acc
-    | hd :: tl -> let com = List.rev (completion ( (decomposition (Int64.of_int cpt)), log2_arete length) ) in aux tl (cpt+1) (  (com ,hd ) :: acc)
+    | hd :: tl -> let com = List.rev (completion ( (decomposition cpt), log2_arete length) ) in aux tl (cpt+1) (  (com ,hd ) :: acc)
     in  List.rev (aux lb 0 []) 
 
 (*  test *)
@@ -267,11 +268,9 @@ let ex_cons_arbre2 = cons_arbre ex_list2
      Node (4, Leaf false, Leaf false)))) *)
 
 (*  test correct! *)
-let ex_100 =genAlea 100
-let arb_100 =cons_arbre ex_100
 
 (********************** test de la question 2.8  --> 25899 ********************************)
-let ex_25899 = decomposition 25899L
+let ex_25899 = decomposition 25899
 (* [true; true; false; true; false; true; false; false; true; false; true; false;false; true; true] *)
 let dbt_25899 = cons_arbre ex_25899
 (* Node (1,
@@ -303,12 +302,10 @@ let liste_feuilles_25899 = liste_feuilles dbt_25899
       false; true; true; false]  correcte!  *)
 
 (*  test correct! *)
-let lfb_100 = liste_feuilles arb_100
-
 
 (**********************Question 3.10 ********************)
 
-type node_id_type = GE of int64 list | BL of bool
+type node_id_type = GE of int list | BL of bool
 
 type graphe_node = {id:node_id_type }
 
@@ -323,8 +320,8 @@ type liste_deja_vus = elements list
 (**********************Question 3.11 ********************)
 (** Utilisation de ref := et ! **)
 let list_vide = ref []    (** val list_vide : '_weak1 list ref = {contents = []} **)
-let _ = list_vide := 1L :: !list_vide  (** - : unit = () **)
-let list = list_vide  (** - : int list ref = {contents = [1L]} **)
+let _ = list_vide := 1 :: !list_vide  (** - : unit = () **)
+let list = list_vide  (** - : int list ref = {contents = [1]} **)
 
 
 (** Préparation de la fonction compressionParListe**)
@@ -334,11 +331,11 @@ let rec sup_prefix0 l =
   match l with
     | [] -> []
     | hd :: tl -> 
-      if hd = 0L then sup_prefix0 tl
+      if hd = 0 then sup_prefix0 tl
       else l 
 
  (** test **)
- let ex_sup_prefix0 = sup_prefix0 [0L;0L;1L;0L;2L;0L] (*[1L; 0L; 2L; 0L]*)
+ let ex_sup_prefix0 = sup_prefix0 [0;0;1;0;2;0] (*[1; 0; 2; 0]*)
  (** test correct!! **)
  
  let liste_feuille_to_ge lf =
@@ -349,10 +346,9 @@ let rec sup_prefix0 l =
     | false -> aux (List.rev (completion ((List.rev lf),(list_length - 64)))) ((composition (completion (lf,64))) ::acc)
    (*** explication:  si length > 64, acc @ les premiers 64 ensuite on la reste sauf que les premiers 64 va continuer la récursive ***)
     in let ret = aux lf [] in
-  if ret = [] then [0L]
+  if ret = [] then [0]
   else ret
 (** test liste_feuille_to_ge  est juste derrière que le test de ge_to_liste_feuille **)
- let lfg = liste_feuille_to_ge lfb_100
 
 (** 2. ge_to_liste_feuille **)
 (** decomposition version num_liste **)
@@ -365,8 +361,8 @@ let decomposition_ge ge_num_liste =
   in aux ge_num_liste []
 
 (** test **)  
-let ex_dec_ge1 = decomposition_ge [1L] (*[true]*)
-let ex_dec_ge2 = decomposition_ge [2L;1L]
+let ex_dec_ge1 = decomposition_ge [1] (*[true]*)
+let ex_dec_ge2 = decomposition_ge [2;1]
 (* [false; true; false; false; false; false; false; false; false; false;   10 éléments chaque ligne
     false;false; false; false; false; false; false; false; false; false;
     false; false;false; false; false; false; false; false; false; false;
@@ -379,7 +375,7 @@ let ex_dec_ge2 = decomposition_ge [2L;1L]
 
 let ge_to_liste_feuille ge = liste_feuilles (cons_arbre (decomposition_ge ge))
 (** test ge_to_liste_feuille **)
-let ex_ge_to_fl1 = ge_to_liste_feuille [2L;1L] 
+let ex_ge_to_fl1 = ge_to_liste_feuille [2;1] 
 (* 
 [false; true; false; false; false; false; false; false; false; false; 
  false;false; false; false; false; false; false; false; false; false; 
@@ -395,22 +391,24 @@ let ex_ge_to_fl1 = ge_to_liste_feuille [2L;1L]
  false; false; false; false; false; false; false; false; false;false; 
  false; false; false; false; false; false; false; false]  --> 128 élements*)
 
-let ex_ge_to_fl2 = ge_to_liste_feuille [1L] 
+let ex_ge_to_fl2 = ge_to_liste_feuille [1] 
 
 (** test liste_feuille_to_ge **)
-let length1 = List.length (ge_to_liste_feuille [1L])                 (* 2 *)
-let ex_lf_to_ge1 = liste_feuille_to_ge (ge_to_liste_feuille [1L])         (* - : int list = [1L] *)
-let length2 = List.length (ge_to_liste_feuille [2L;1L])               (* 128 *)
-let ex_lf_to_ge2 = liste_feuille_to_ge (ge_to_liste_feuille [2L;1L])       (* - : int list = [2L;1L] *)
-let length3 = List.length (ge_to_liste_feuille [3L;2L;1L])             (* 256 *)
-let ex_lf_to_ge3 = liste_feuille_to_ge (ge_to_liste_feuille [3L;2L;1L])     (* - : int list = [3L;2L;1L] *)
-let length4 = List.length (ge_to_liste_feuille [4L;3L;2L;1L])           (* 256 *)
-let length5 = List.length (ge_to_liste_feuille [5L;4L;3L;2L;1L])         (* 512 *)
-let ex_lf_to_ge5 = liste_feuille_to_ge (ge_to_liste_feuille [5L;4L;3L;2L;1L]) (* - : int list = [5L; 4L; 3L; 2L; 1L] *)
+let length1 = List.length (ge_to_liste_feuille [1])                 (* 2 *)
+let ex_lf_to_ge1 = liste_feuille_to_ge (ge_to_liste_feuille [1])         (* - : int list = [1] *)
+let length2 = List.length (ge_to_liste_feuille [2;1])               (* 128 *)
+let ex_lf_to_ge2 = liste_feuille_to_ge (ge_to_liste_feuille [2;1])       (* - : int list = [2;1] *)
+let length3 = List.length (ge_to_liste_feuille [3;2;1])             (* 256 *)
+let ex_lf_to_ge3 = liste_feuille_to_ge (ge_to_liste_feuille [3;2;1])     (* - : int list = [3;2;1] *)
+let length4 = List.length (ge_to_liste_feuille [4;3;2;1])           (* 256 *)
+let length5 = List.length (ge_to_liste_feuille [5;4;3;2;1])         (* 512 *)
+let ex_lf_to_ge5 = liste_feuille_to_ge (ge_to_liste_feuille [5;4;3;2;1]) (* - : int list = [5; 4; 3; 2; 1] *)
 
  (** test correct **)
 
 (** 3. check si n est la première composante d’un couple stocké dans ListeDejaVus **)
+let ex_25899 = decomposition 25899
+let dbt_25899 = cons_arbre ex_25899
 
 let rec check_ldv n ldv =
   match ldv with
@@ -452,14 +450,53 @@ let dbt_to_liste_deja_vus dbt =
     let _ = aux l in aux r
     in let _ = aux dbt in !listeDejaVus_ref
 
+(* test *)
+let test_dbt_to_liste_deja_vus =  dbt_to_liste_deja_vus dbt_25899
+(* [{entier = GE [1]; node_l = {contents = {id = BL true}};
+node_r = {contents = {id = BL false}}; depth = 4};
+{entier = GE [2]; node_l = {contents = {id = BL false}};
+node_r = {contents = {id = BL true}}; depth = 4};
+{entier = GE [6]; node_l = {contents = {id = GE [2]}};
+node_r = {contents = {id = GE [1]}}; depth = 3};
+{entier = GE [1]; node_l = {contents = {id = BL true}};
+node_r = {contents = {id = BL false}}; depth = 4};
+{entier = GE [1]; node_l = {contents = {id = BL true}};
+node_r = {contents = {id = BL false}}; depth = 4};
+{entier = GE [5]; node_l = {contents = {id = GE [1]}};
+node_r = {contents = {id = GE [1]}}; depth = 3};
+{entier = GE [101]; node_l = {contents = {id = GE [5]}};
+node_r = {contents = {id = GE [6]}}; depth = 2};
+{entier = GE [0]; node_l = {contents = {id = BL false}};
+node_r = {contents = {id = BL false}}; depth = 4};
+{entier = GE [2]; node_l = {contents = {id = BL false}};
+node_r = {contents = {id = BL true}}; depth = 4};
+{entier = GE [2]; node_l = {contents = {id = GE [2]}};
+node_r = {contents = {id = GE [0]}}; depth = 3};
+{entier = GE [2]; node_l = {contents = {id = BL false}};
+node_r = {contents = {id = BL true}}; depth = 4};
+{entier = GE [3]; node_l = {contents = {id = BL true}};
+node_r = {contents = {id = BL true}}; depth = 4};
+{entier = GE [11]; node_l = {contents = {id = GE [3]}};
+node_r = {contents = {id = GE [2]}}; depth = 3};
+{entier = GE [43]; node_l = {contents = {id = GE [11]}};
+node_r = {contents = {id = GE [2]}}; depth = 2};
+{entier = GE [25899]; node_l = {contents = {id = GE [43]}};
+node_r = {contents = {id = GE [101]}}; depth = 1};
+{entier = BL true; node_l = {contents = {id = BL true}};
+node_r = {contents = {id = BL true}}; depth = -1};
+{entier = BL false; node_l = {contents = {id = BL false}};
+node_r = {contents = {id = BL false}}; depth = -1}] *)
+(* test correct! *)
+
+
 let z_sup ldv_ref e_sup replace=
   let rec aux ldv acc =
    match ldv with
   | [] -> acc
   |({entier = e; node_l = l; node_r = r; depth = d} as hd) :: tl -> 
-  if e = e_sup  || e = GE([0L]) then aux tl acc
+  if e = e_sup  || e = GE([0]) then aux tl acc
   else if !l.id = e_sup then aux tl ({entier = e;node_l = replace;node_r = r;depth=d} :: acc)
-  else if !r.id = e_sup || !r.id = GE([0L]) then aux tl ({entier = e;node_l = l;node_r = replace;depth=d} :: acc)
+  else if !r.id = e_sup || !r.id = GE([0]) then aux tl ({entier = e;node_l = l;node_r = replace;depth=d} :: acc)
   else aux tl (hd::acc)
   in let ret = aux !ldv_ref []  in ldv_ref := ret
 
@@ -474,18 +511,18 @@ let rec maj_regle_Z ldv_ref =
 
 
 (* test *)
-let a = ref [{entier = GE [0L]; node_l = {contents = {id = BL false}};
+let a = ref [{entier = GE [0]; node_l = {contents = {id = BL false}};
   node_r = {contents = {id = BL false}}; depth = 4};
-  {entier = GE [3L]; node_l = {contents = {id = BL true}};
+  {entier = GE [3]; node_l = {contents = {id = BL true}};
   node_r = {contents = {id = BL true}}; depth = 4}
-  ;{entier = GE [0L]; node_l = {contents = {id = BL true}};
+  ;{entier = GE [0]; node_l = {contents = {id = BL true}};
   node_r = {contents = {id = BL false}}; depth = 4};
-  {entier = GE [2L]; node_l = {contents = {id = GE [2L]}};
-  node_r = {contents = {id = GE [0L]}}; depth = 3};
-  {entier = GE [0L]; node_l = {contents = {id = BL false}};
+  {entier = GE [2]; node_l = {contents = {id = GE [2]}};
+  node_r = {contents = {id = GE [0]}}; depth = 3};
+  {entier = GE [0]; node_l = {contents = {id = BL false}};
     node_r = {contents = {id = BL false}}; depth = 4};
-    {entier = GE [2L]; node_l = {contents = {id = GE [2L]}};
-node_r = {contents = {id = GE [0L]}}; depth = 3};
+    {entier = GE [2]; node_l = {contents = {id = GE [2]}};
+node_r = {contents = {id = GE [0]}}; depth = 3};
 {entier = BL false; node_l = {contents = {id = BL false}};
 node_r = {contents = {id = BL false}}; depth = -1}
 ]
@@ -519,8 +556,8 @@ let ge1_to_bltrue ldv_ref =
    match ldv with
   | [] -> acc
   |({entier = e; node_l = l; node_r = r; depth = d} as hd) :: tl -> 
-  if !l.id = GE[1L] then aux tl ({entier = e;node_l = ref {id =BL(true)};node_r = r;depth=d} :: acc)
-  else if !r.id = GE[1L] || !r.id = GE([0L]) then aux tl ({entier = e;node_l = l;node_r = ref {id =BL(true)};depth=d} :: acc)
+  if !l.id = GE[1] then aux tl ({entier = e;node_l = ref {id =BL(true)};node_r = r;depth=d} :: acc)
+  else if !r.id = GE[1] || !r.id = GE([0]) then aux tl ({entier = e;node_l = l;node_r = ref {id =BL(true)};depth=d} :: acc)
   else aux tl (hd::acc)
   in let ret = aux !ldv_ref []  in ldv_ref := ret
 
@@ -531,13 +568,7 @@ let compressionParListe arbre_decision =
   !ldv_ref
 
 (** test **)
-let ex_25899 = decomposition 25899L
-let dbt_25899 = cons_arbre ex_25899
 let test_compression_par_liste_25899 =  compressionParListe dbt_25899 
-
-
-
-
 
 
 (**********************Question 3.12 ********************)
@@ -563,38 +594,16 @@ let ge_to_int ge=
     | hd :: tl ->  hd)
   | _ -> failwith "not ge it's bl"
 
-
 let bool_to_string b =
   if b then "true"
   else "false"
 
-(*let node_id_to_string node_id =
+let node_id_to_string node_id =
   match node_id with
    | BL(b) -> bool_to_string b
-   | GE (ge) -> string_of_int (ge_to_int (GE (ge) ))*)
+   | GE (ge) -> string_of_int (ge_to_int (GE (ge) ))
 
-let test_il_to_s = ge_to_int (GE[3L;4L;2L;1L]) (*3 correct*)
- 
-let ge_to_string ge =
-  let rec loop ge aux =
-    match ge with
-    | GE (il) ->
-      (match il with
-      | [] -> failwith "no number" 
-      |x::[] -> aux^(Int64.to_string x)
-      | hd :: tl -> loop (GE tl) (aux ^ Int64.to_string  hd ^"_")
-      )
-    | _ -> failwith "not ge it's bl"
-      in loop ge "list_"
-
-  let a =ge_to_string (GE[3L;4L;2L;1L])
-
-  let node_id_to_string node_id =
-    match node_id with
-     | BL(b) -> bool_to_string b
-     | GE (ge) -> ge_to_string node_id
-
-     let b =node_id_to_string (GE[3L;4L;2L;1L]) (*list_3_4_2_1*)
+let test_il_to_s = ge_to_int (GE[3;4;2;1]) (*3 correct*)
 
 (** l'implémentation de sémantique de dot **)
 let cons_graphe_dot_string_liste arbre_de_decision = 
@@ -614,12 +623,7 @@ let cons_graphe_dot_string_liste arbre_de_decision =
     in aux tl
   in aux elements_liste
 
-  let num = [64444L;86555L;3L]
-  let bl_num = decomposition_liste num
-  let arb_num = cons_arbre bl_num
-  let test_num = cons_graphe_dot_string_liste arb_100
-
-let test_cons_graphe_dot_string_liste = cons_graphe_dot_string_liste arb_num
+let test_cons_graphe_dot_string_liste = cons_graphe_dot_string_liste dbt_25899
 
 
 (** Le principale de construction d'un ficher dot **)    
@@ -642,10 +646,9 @@ let dot fichier arbre_de_decision =
 let test_graphe = dot file_graphe dbt_25899
      
 
-
 (**********************Question 3.13 ********************)
 (* On a déjà fait cette question quand on teste la question 2.8 *)
-let ex_25899 = decomposition 25899L
+let ex_25899 = decomposition 25899
 (* [true; true; false; true; false; true; false; false; true; false; true; false;false; true; true] *)
 let dbt_25899 = cons_arbre ex_25899
 (* val dbt_25899 : decision_binary_tree/2 =
@@ -659,7 +662,6 @@ Node (1,
 
   (** C'est exactement la même arbre que la figure 1 dans l'annoncé**)
 
-
 (**********************Question 3.14 ********************)
 
 (* GraphViz Pocket Reference compressionParListe *)
@@ -667,13 +669,11 @@ Node (1,
 
 
 
-
 (**********************Question 4.15 ********************)
+
 type arbre_deja_vus =
   | Noeud of elements * arbre_deja_vus * arbre_deja_vus
   | Feuille
-
-
 
 (**********************Question 4.16 ********************)
 (* 
@@ -785,9 +785,9 @@ let rec is_in_tree ge tree =
 
 
 (* test *)
-let ex_tree = Noeud({entier = GE([1L]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1},Feuille,Feuille)
-let ex_test1 = is_in_tree (GE[1L]) ex_tree (*true*)
-let ex_test2 = is_in_tree (GE[2L]) ex_tree (*false*)
+let ex_tree = Noeud({entier = GE([1]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1},Feuille,Feuille)
+let ex_test1 = is_in_tree (GE[1]) ex_tree (*true*)
+let ex_test2 = is_in_tree (GE[2]) ex_tree (*false*)
 (* test correct! *)
 
 let inserer_node_in_tree node tree =
@@ -807,8 +807,8 @@ let inserer_node_in_tree node tree =
     in aux tree feuille_liste
 
 (* test *)
-let ex_test3 = inserer_node_in_tree {entier = GE([1L]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1} ex_tree
-let ex_test4 = inserer_node_in_tree {entier = GE([2L]); node_l = ref {id = BL(false)}  ; node_r =  ref {id = BL(true)}; depth = 1} ex_tree
+let ex_test3 = inserer_node_in_tree {entier = GE([1]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1} ex_tree
+let ex_test4 = inserer_node_in_tree {entier = GE([2]); node_l = ref {id = BL(false)}  ; node_r =  ref {id = BL(true)}; depth = 1} ex_tree
 (* Noeud
 ({entier = GE [1]; node_l = {contents = {id = BL true}};
   node_r = {contents = {id = BL false}}; depth = 1},
@@ -832,7 +832,7 @@ let maj_node_in_tree_l node tree node_l =
     in aux tree 
 
   (* test *)
-  let ex_maj_l = maj_node_in_tree_l {entier = GE([1L]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1} ex_test4  (ref {id = GE[2L]})
+  let ex_maj_l = maj_node_in_tree_l {entier = GE([1]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1} ex_test4  (ref {id = GE[2]})
   (* test correct! *)
 
   let maj_node_in_tree_r node tree node_r =
@@ -847,7 +847,7 @@ let maj_node_in_tree_l node tree node_l =
       in aux tree 
 
 (* test *)
-let ex_maj_r = maj_node_in_tree_r {entier = GE([1L]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1} ex_test4  (ref {id = GE[2L]})
+let ex_maj_r = maj_node_in_tree_r {entier = GE([1]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1} ex_test4  (ref {id = GE[2]})
 (* test correct! *)
 
 (* let rec maj_l_elt_in_tree ge tree l  *)
@@ -955,7 +955,7 @@ let to_adv list =
     in aux list Feuille false
 
 let b =  to_adv a
-let test_supp_in_list = supp_in_list a (GE[0L]) 
+let test_supp_in_list = supp_in_list a (GE[0]) 
 
 let c = to_adv test_supp_in_list
 
@@ -1026,25 +1026,20 @@ let measure_time f =
   let elapsed_time = end_time -. start_time in
   (result, elapsed_time)
 
-
-let test_mesure n =  cons_arbre (genAlea n)
-  
 let time_compression_Liste () =
-  let _ = compressionParListe (test_mesure 100) in
+  let _ = compressionParListe dbt_25899 in
   ()
 
 let () = 
   let (_, elapsed_time) = measure_time time_compression_Liste in
   Printf.printf "Function compressionParListe took %f seconds to run.\n" elapsed_time
 
+  
+  (* let test_mesure n =
+    match genAlea n with
+    | [] -> 0
+    | hd :: tl -> hd  *)
 
-  let ex_25899 = decomposition 25899L
+  let ex_25899 = decomposition 25899
   (* [true; true; false; true; false; true; false; false; true; false; true; false;false; true; true] *)
   let dbt_25899 = cons_arbre ex_25899
-
-
-
-
-
-
-
