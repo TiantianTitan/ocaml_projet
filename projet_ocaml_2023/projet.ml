@@ -34,7 +34,6 @@ let completion couple =
   let com_2 =  completion([false; true; true; false; false; true], 8)  (*[false; true; true; false; false; true; false; false]*)
   (*  test correct! *)
 
-
   (*** Question 1.2 version int64 list -> bool list ***)
   let decomposition_liste int_list =
     let rec aux l acc =
@@ -45,8 +44,6 @@ let completion couple =
     in aux int_list []
 
     let l_int64 = decomposition_liste [4L; 6L]
-
-
 
 
 (**********************Question 1.4 ********************)
@@ -64,8 +61,6 @@ let listbool = [false;true;true]
 let ex_com1 = composition listbool (* - : int = 6L *)
 let ex_com2 = composition [true;true] (*- : int = 3L *)
 (*  test correct! *)
-
-
 
 (****************  version composition_liste bool list -> int list  ***********************)
 let rec sup_prefixe l n =
@@ -100,7 +95,6 @@ let ex_com2 = composition [true;true] (*- : int = 3L *)
 
  (****test correct!****)
 
-  
 (**********************Question 1.5 ********************)
 
 let table x n = completion ((decomposition x),n)
@@ -137,7 +131,6 @@ let pow_rec_t a n =
       else aux (n-64) (completion (((decomposition (Random.int64 Int64.max_int)),64)) @ acc)
     in aux n []
   
-
 let gen61 = (pow_rec 2L 61)  (*int = 2305843009213693952L*)
 let gen62 = (pow_rec 2L 62)  (*int =  4611686018427387904L*)
 let gen63 = (pow_rec 2L 63)  (*int = -9223372036854775808L*)
@@ -463,7 +456,6 @@ let z_sup ldv_ref e_sup replace=
   else aux tl (hd::acc)
   in let ret = aux !ldv_ref []  in ldv_ref := ret
 
-
 let rec maj_regle_Z ldv_ref =
   match !ldv_ref with
   | [] -> ()
@@ -471,7 +463,6 @@ let rec maj_regle_Z ldv_ref =
     if !r.id = BL(false) then
     let _ = z_sup ldv_ref e l in maj_regle_Z (ref tl)
     else maj_regle_Z (ref tl)
-
 
 (* test *)
 let a = ref [{entier = GE [0L]; node_l = {contents = {id = BL false}};
@@ -493,7 +484,6 @@ let f = maj_regle_Z a
 let b = !a
 
 
-
 let maj_regle_M ldv_ref =
   let reste = ref [] in
   let supp = ref [] in
@@ -512,7 +502,6 @@ let maj_regle_M ldv_ref =
       else aux2 tl2
     in  let _ = aux2 tl in aux tl
   in aux ldv 
-
 
 let ge1_to_bltrue ldv_ref =
   let rec aux ldv acc =
@@ -535,11 +524,6 @@ let ex_25899 = decomposition 25899L
 let dbt_25899 = cons_arbre ex_25899
 let test_compression_par_liste_25899 =  compressionParListe dbt_25899 
 
-
-
-
-
-
 (**********************Question 3.12 ********************)
 
 (** Utilisation de ficher en ocaml **)
@@ -554,7 +538,6 @@ let () =
 (** L'exemple est dans le ficher test.dot **)
 
 (** L'excercice ci-dessous c'est pour ge < 2 pow 64  **)
-
 let ge_to_int ge=
   match ge with
   | GE (il) ->
@@ -563,15 +546,9 @@ let ge_to_int ge=
     | hd :: tl ->  hd)
   | _ -> failwith "not ge it's bl"
 
-
 let bool_to_string b =
   if b then "true"
   else "false"
-
-(*let node_id_to_string node_id =
-  match node_id with
-   | BL(b) -> bool_to_string b
-   | GE (ge) -> string_of_int (ge_to_int (GE (ge) ))*)
 
 let test_il_to_s = ge_to_int (GE[3L;4L;2L;1L]) (*3 correct*)
  
@@ -621,7 +598,6 @@ let cons_graphe_dot_string_liste arbre_de_decision =
 
 let test_cons_graphe_dot_string_liste = cons_graphe_dot_string_liste arb_num
 
-
 (** Le principale de construction d'un ficher dot **)    
 let file_graphe = "./graphe_par_list.dot"
 let dot fichier arbre_de_decision = 
@@ -641,8 +617,6 @@ let dot fichier arbre_de_decision =
     
 let test_graphe = dot file_graphe dbt_25899
      
-
-
 (**********************Question 3.13 ********************)
 (* On a déjà fait cette question quand on teste la question 2.8 *)
 let ex_25899 = decomposition 25899L
@@ -659,20 +633,16 @@ Node (1,
 
   (** C'est exactement la même arbre que la figure 1 dans l'annoncé**)
 
-
 (**********************Question 3.14 ********************)
 
 (* GraphViz Pocket Reference compressionParListe *)
 (* https://graphs.grevian.org/graph/4854942932140032 *)
 
 
-
-
 (**********************Question 4.15 ********************)
 type arbre_deja_vus =
   | Noeud of elements * arbre_deja_vus * arbre_deja_vus
   | Feuille
-
 
 
 (**********************Question 4.16 ********************)
@@ -698,7 +668,6 @@ let element = {entier = GE(ge); node_l = ref new_node_l; node_r = ref new_node_r
     | Noeud(elt,l,r) -> Noeud(elt,aux l, aux r)
     in aux adv
 
-
 let dbt_to_arbre_deja_vus dbt =
   let rec aux dbt = 
   let ge = liste_feuille_to_ge (liste_feuilles dbt) in
@@ -715,7 +684,6 @@ let dbt_to_arbre_deja_vus dbt =
     let element = {entier = GE(ge); node_l = ref new_node_l; node_r = ref new_node_r; depth = d} in
     Noeud(element, aux l , aux r)
   in let new_dbt = aux dbt in (*add_true_false new_dbt*) new_dbt
-
 
 let test_25899_adv = dbt_to_arbre_deja_vus dbt_25899 
 
@@ -783,7 +751,6 @@ let rec is_in_tree ge tree =
     if elt.entier = ge then true
     else is_in_tree ge l || is_in_tree ge r
 
-
 (* test *)
 let ex_tree = Noeud({entier = GE([1L]); node_l = ref {id = BL(true)}  ; node_r =  ref {id = BL(false)}; depth = 1},Feuille,Feuille)
 let ex_test1 = is_in_tree (GE[1L]) ex_tree (*true*)
@@ -819,7 +786,6 @@ Noeud
 Feuille) *)
 
 (* test correct! *)
-
 let maj_node_in_tree_l node tree node_l =
   match node.entier with
   | BL(b) -> tree
@@ -852,7 +818,6 @@ let ex_maj_r = maj_node_in_tree_r {entier = GE([1L]); node_l = ref {id = BL(true
 
 (* let rec maj_l_elt_in_tree ge tree l  *)
 
-
 (**********************Question 4.17 ********************)
 
 let get_noeud_par_chemin adv blist =
@@ -863,8 +828,6 @@ let get_noeud_par_chemin adv blist =
    | Noeud(elt,l,r) , hd ::tl -> if hd = false then aux l tl
    else aux r tl
    in aux adv blist
-
-
 
 let regle_M adv =
   let ret_ref = ref Feuille in 
@@ -970,11 +933,7 @@ let compressionParArbre arbre_decision =
   let _  = maj_regle_Z list_ref in let _ = ge1_to_bltrue list_ref in  let  _ =  adv_ref := to_adv (!list_ref) in let ret = regle_M !adv_ref in
   ret
 
-  
 let finish = compressionParArbre dbt_25899
-
-
-
 
 let cons_graphe_dot_string_arbre arbre_de_decision = 
   let elements_arbre = compressionParArbre arbre_de_decision  in
@@ -1019,32 +978,70 @@ let test_graphe = dot file_graphe dbt_25899
 (* https://graphs.grevian.org/graph/6211502614773760 *)
 
 
+(****************** Question 6.20 *******************)
+
+let test_mesure n =  cons_arbre (genAlea n)
+
+let test_2_pow_n = test_mesure 1024
+let time_compression_Liste () =
+  let _ = compressionParListe test_2_pow_n in
+  ()
+let time_compression_Arbre () =
+  let _ = compressionParArbre test_2_pow_n in
+  ()
+(*******************  mesure time *******************)
 let measure_time f =
   let start_time = Unix.gettimeofday () in
   let result = f () in
   let end_time = Unix.gettimeofday () in
   let elapsed_time = end_time -. start_time in
   (result, elapsed_time)
-
-
-let test_mesure n =  cons_arbre (genAlea n)
-  
-let time_compression_Liste () =
-  let _ = compressionParListe (test_mesure 100) in
-  ()
-
 let () = 
   let (_, elapsed_time) = measure_time time_compression_Liste in
-  Printf.printf "Function compressionParListe took %f seconds to run.\n" elapsed_time
+  let _ = Printf.printf "Function compressionParListe took %f seconds to run.\n" elapsed_time in
+  let (_, elapsed_time) = measure_time time_compression_Arbre in
+  Printf.printf "Function compressionParArbre took %f seconds to run.\n" elapsed_time
+(*******************  mesure space *******************)
 
+let measure_memory_use_by_list f =
+    let open Gc in
+    let initial_stats = quick_stat () in
+    let _ = f () in 
+    let after_stats = quick_stat () in
+    let memory_used = after_stats.minor_words -. initial_stats.minor_words in
+    Printf.printf "Approximate LISTE memory used: %f words\n" memory_used
 
-  let ex_25899 = decomposition 25899L
-  (* [true; true; false; true; false; true; false; false; true; false; true; false;false; true; true] *)
-  let dbt_25899 = cons_arbre ex_25899
+let () =
+    measure_memory_use_by_list time_compression_Liste
 
+let measure_memory_use_by_tree f =
+  let open Gc in
+  let initial_stats = quick_stat () in
+  let _ = f () in 
+  let after_stats = quick_stat () in
+  let memory_used = after_stats.minor_words -. initial_stats.minor_words in
+  Printf.printf "Approximate ARBRE memory used: %f words\n" memory_used
 
+let () =
+  measure_memory_use_by_tree time_compression_Arbre  
 
+(*************   mesure taux compression  *************)
+let count_node dbt =
+  let rec aux dbt acc =
+  match dbt with
+  | Leaf(b) -> acc
+  | Node(_,l,r) -> aux r (aux l (acc+1))
+  in aux dbt 0
+let count_noeud ele_list =
+  let rec aux ele_list acc =
+    match ele_list with
+    | [] -> acc
+    | hd :: tl -> aux tl (acc+1)
+    in aux ele_list 0
 
-
-
-
+let taux_compression dbt =
+  let origin_count = count_node dbt in
+  let compress_count = count_noeud (compressionParListe dbt) in
+  (float_of_int compress_count) /.  (float_of_int origin_count)
+let () = let a = taux_compression test_2_pow_n in
+Printf.printf "Compreesion taux = %f%%.\n" (a*.100.)
