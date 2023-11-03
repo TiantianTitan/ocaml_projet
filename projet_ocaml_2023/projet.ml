@@ -70,7 +70,7 @@ let ex_com2 = composition [true;true] (*- : int = 3L *)
 (*  test correct! *)
 
 (****************  version composition_liste bool list -> int list  ***********************)
-let rec sup_prefixe l n = (*O(n) mais ici n =nb elt que vous souhaitez supprimer *)
+let rec sup_prefixe l n = (*O(n) mais ici n =nb elt que on va supprimer *)
   match l,n with
   |[], n -> []
   |_, 0 -> l
