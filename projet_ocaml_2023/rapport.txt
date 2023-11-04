@@ -1,0 +1,9 @@
+Rapport
+
+Nous avons mesuré le temps d'exécution, la consommation d'espace et le taux de compression de la fonction de compression (par liste, par arbre) en prenant le nombre de nœuds d'un arbre de décision binaire comme variable indépendante. À travers les données et les graphiques, on peut observer que : 
+
+1. Lorsque le nombre de nœuds augmente de 2^k à 2^k+1, le temps et la consommation d'espace augmentent significativement, et le taux de compression augmente de manière substantielle. Cela indique que la taille de l'arbre double à ce moment et génère un grand nombre de nœuds false, qui doivent tous être compressés. 
+
+2. Lorsque le nombre de nœuds augmente de 2^k+1 à 2^(k+1), l'utilisation du temps et de l'espace reste relativement stable, mais on peut constater que le taux de compression diminue lentement. Cela suggère que sous la même échelle de couches de l'arbre, plus il y a de nœuds, plus le taux de compression est bas, parce que plus le nombre de nœuds se rapproche de 2^k, plus la proportion de true est grande, et donc l'espace nécessaire à la compression devient plus petit.
+
+3. On peut constater qu'en utilisant la méthode de compression d'arbre, l'espace et le temps occupés sont toujours légèrement inférieurs à l'utilisation de la méthode de compression de liste chaînée, ce qui montre que l'utilisation d'arbre est plus efficace.
