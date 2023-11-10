@@ -143,9 +143,7 @@ let pow_rec_t a n =  (*O(n)*)
 let gen61 = (pow_rec 2L 61)  (*int64 = 2305843009213693952L*)
 let gen62 = (pow_rec 2L 62)  (*int64 =  4611686018427387904L*)
 let gen63 = (pow_rec 2L 63)  (*int64 = -9223372036854775808L*)
-let gen61 = (pow_rec 2L 61)  (*int = 2305843009213693952L*)
-let gen62 = (pow_rec 2L 62)  (*int =  4611686018427387904L*)
-let gen63 = (pow_rec 2L 63)  (*int = -9223372036854775808L*)
+
 (** test **)
 let ex_0 = genAlea 0   (*[]*)
 let ex_61 = genAlea 61  (*[false; false; false; true; false; false ;...; true]*)
@@ -176,8 +174,7 @@ let ex_100 = genAlea 100  (*[false; false; false; true; false; false;  false; tr
                             false; false; false; true; true; false;false; true; true; false; false; true;
                             false; false; true; false; false; false; true; true; true; false; true; true;
                             true; false; true; false]*)
-(** test correct!**)                                        
-(** test correct!**)                              
+(** test correct!**)                                 
 
 (**********************Question 2.7 ********************)
 type decision_binary_tree =
@@ -338,7 +335,7 @@ let list = list_vide  (** - : int list ref = {contents = [1L]} **)
 (** Préparation de la fonction compressionParListe**)
 
 (** 1. liste_feille_to_ge **)
-let rec sup_prefix0 l =(*O*)
+let rec sup_prefix0 l =(*O(n)*)
   match l with
     | [] -> []
     | hd :: tl -> 
@@ -350,8 +347,7 @@ let rec sup_prefix0 l =(*O*)
  (** test correct!! **)
  
  let liste_feuille_to_ge lf = (*O(n*t/64)ici t=n)==>O(n²) *)(*La récursion dans liste_feuille_to_ge ne provoque pas une multiplication de la complexité,*)
-                              (*car les sous-listes de lf ne sont pas nécessairement disjointes.La fonction traite 64 éléments à la fois, puis répète le processus sur les 64 éléments suivants, et ainsi de suite.*) 
-                              (*Par conséquent, la complexité totale est dominée par le nombre de groupes de 64 éléments dans la liste lf, et non par une multiplication de la complexité.*)
+                              
   let rec aux lf acc =  
     let list_length = List.length lf in   
     match list_length <= 64 with
